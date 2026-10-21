@@ -1,0 +1,6 @@
+@TestPluginHost_HostAddress = http://localhost:5015
+
+GET {{TestPluginHost_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

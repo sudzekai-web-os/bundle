@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    <SignAssembly>true</SignAssembly>
+
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+    <Authors>Sudzekai</Authors>
+    <Company>Sudzekai</Company>
+    <Version>1.0.0</Version>
+
+    <PackageId>Sudzekai.WebOs.Hosting</PackageId>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/sudzekai-web-os/bundle</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/sudzekai-web-os/bundle.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+
+    <Description>Sudzekai WebOS plugin host infrastructure for ASP.NET Core applications.</Description>
+    <PackageTags>webos;plugin;sudzekai;hosting</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="..\Sudzekai.WebOs.Core\Sudzekai.WebOs.Core.csproj" />
+  </ItemGroup>
+
+</Project>

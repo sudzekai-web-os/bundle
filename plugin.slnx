@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="Sudzekai.WebOs.Core/Sudzekai.WebOs.Core.csproj" Id="9c81d130-9781-4e09-8604-a10cc190fbf8" />
+  <Project Path="Sudzekai.WebOs.Hosting/Sudzekai.WebOs.Hosting.csproj" Id="4a2cd5c4-fe5e-413e-b5c3-930fd569780f" />
+  <Project Path="Sudzekai.WebOs.Plugin/Sudzekai.WebOs.Plugin.csproj" />
+  <Project Path="TestPlugin/TestPlugin.csproj" Id="28b4118e-78b7-4812-afd0-8209252e65dc" />
+  <Project Path="TestPluginHost/TestPluginHost.csproj" Id="579bfd3d-834d-4dde-b2a4-9c3a8a92dad9" />
+</Solution>
