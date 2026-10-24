@@ -6,6 +6,16 @@
 
         HandlerHttpMethod HttpMethod { get; }
 
-        Task<HandlerResult> Handle(HandlerRequest request);
+        HandlerAuthorizationInfo? AuthorizationInfo { get => null; }
+
+        HandlerFilteringInfo? FilteringInfo { get => null; }
+
+        HandlerLimitingInfo? LimitingInfo { get => null; }
+
+        HandlerOpenApiInfo? OpenApiInfo { get => null; }
+
+        HandlerRoutingInfo? RoutingInfo { get => null; }
+
+        Task<HandlerResult> HandleAsync(HandlerRequest request);
     }
 }

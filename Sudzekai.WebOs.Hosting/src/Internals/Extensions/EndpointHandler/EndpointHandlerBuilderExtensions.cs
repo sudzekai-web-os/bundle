@@ -8,14 +8,13 @@ namespace Sudzekai.WebOs.Hosting
         {
             public static EndpointHandler FromDescriptor(ref EndpointHandlerDescriptor descriptor)
             {
-                EndpointHandler handler = new();
+                EndpointHandler handler = CreateHandler(ref descriptor);
 
-                handler.AsDefaultHandler(ref descriptor);
-                handler.AsAuthorizedHandler(in descriptor);
-                handler.AsFilteredHandler(in descriptor);
-                handler.AsLimitedHandler(in descriptor);
-                handler.AsOpenApiHandler(descriptor);
-                handler.AsRoutedHandler(descriptor);
+                handler.WithAuthorization(GetAuthorizationInfo(ref descriptor));
+                handler.WithFilter(GetFilterInfo(ref descriptor));
+                handler.WithLimiting(GetLimitingInfo(ref descriptor));
+                handler.WithOpenApi(GetOpenApiInfo(ref descriptor));
+                handler.WithRouting(GetRoutingInfo(ref descriptor));
 
                 descriptor.Dispose();
 
@@ -23,35 +22,26 @@ namespace Sudzekai.WebOs.Hosting
             }
         }
 
-        private static unsafe void AsDefaultHandler(this EndpointHandler handler, ref EndpointHandlerDescriptor descriptor)
+        private static unsafe EndpointHandler CreateHandler(ref EndpointHandlerDescriptor descriptor)
         {
             var pattern = AllocationUtilities.ToString(descriptor.Pattern, descriptor.PatternLength);
-
             var method = (HandlerHttpMethod)descriptor.HttpMethod;
-
-            if (!Enum.IsDefined(method))
-                throw new InvalidOperationException("дескриптор содержал невалидный http метод");
-
             var handleDelegate = (delegate* unmanaged<HandlerRequestDescriptor, HandlerResultDescriptor>)descriptor.HandleFunc;
 
-            Func<HandlerRequest, HandlerResult> handleFunc = (req) =>
+            var handleFunc = (HandlerRequest req) =>
             {
                 var describedResult = handleDelegate(req.ToDescriptor());
 
                 return HandlerResult.FromDescriptor(describedResult);
             };
 
-            handler.Pattern = pattern;
-            handler.HttpMethod = method;
-            handler.HandleFunc = handleFunc;
+            return new EndpointHandler(pattern, method, handleFunc);
         }
 
-        private static void AsAuthorizedHandler(this EndpointHandler handler, in EndpointHandlerDescriptor descriptor)
+        private static HandlerAuthorizationInfo? GetAuthorizationInfo(ref EndpointHandlerDescriptor descriptor)
         {
-            handler.IsAuthorizedHandler = descriptor.IsAuthorizedHandler > 0;
-
-            if (!handler.IsAuthorizedHandler)
-                return;
+            if (descriptor.IsAuthorizedHandler == 0)
+                return null;
 
             ClientRole[] requiredRoles = [];
 
@@ -64,53 +54,48 @@ namespace Sudzekai.WebOs.Hosting
             if ((descriptor.RequiredRoles & 4) != 0)
                 requiredRoles = [.. requiredRoles.Append(ClientRole.Viewer)];
 
-            handler.RequiredRoles = requiredRoles;
+            return new(requiredRoles);
         }
 
-        private static void AsFilteredHandler(this EndpointHandler handler, in EndpointHandlerDescriptor descriptor)
-        {
-            handler.IsFilteredHandler = descriptor.IsFilteredHandler > 0;
-        }
+        private static HandlerFilteringInfo? GetFilterInfo(ref EndpointHandlerDescriptor descriptor)
+            => new(descriptor.IsFilteredHandler != 0);
 
-        private static void AsLimitedHandler(this EndpointHandler handler, in EndpointHandlerDescriptor descriptor)
+        private static HandlerLimitingInfo? GetLimitingInfo(ref EndpointHandlerDescriptor descriptor)
         {
-            handler.IsLimitedHandler = descriptor.IsLimitedHandler > 0;
-
-            if (!handler.IsLimitedHandler)
-                return;
+            if (descriptor.IsLimitedHandler == 0)
+                return null;
 
             var rateLimitingPolicy = (RateLimitingPolicy)descriptor.RateLimitingPolicy;
 
             if (!Enum.IsDefined(rateLimitingPolicy))
                 throw new InvalidOperationException("дескриптор содержал невалидную политику ограничения");
 
-            handler.RateLimitingPolicy = rateLimitingPolicy;
+            return new(rateLimitingPolicy);
         }
 
-        private static unsafe void AsOpenApiHandler(this EndpointHandler handler, in EndpointHandlerDescriptor descriptor)
+        private static unsafe HandlerOpenApiInfo? GetOpenApiInfo(ref EndpointHandlerDescriptor descriptor)
         {
-            handler.IsOpenApiHandler = descriptor.IsOpenApiHandler > 0;
+            if (descriptor.IsOpenApiHandler == 0)
+                return null;
 
-            if (!handler.IsOpenApiHandler)
-                return;
+            var name = AllocationUtilities.ToString(descriptor.Name, descriptor.NameLength);
+            var displayName = AllocationUtilities.ToString(descriptor.DisplayName, descriptor.DisplayNameLength);
+            var tags = AllocationUtilities.ToStringArray(descriptor.Tags, descriptor.TagsCount);
+            var summary = AllocationUtilities.ToString(descriptor.Summary, descriptor.SummaryLength);
+            var groupName = AllocationUtilities.ToString(descriptor.GroupName, descriptor.GroupNameLength);
 
-            handler.Name = AllocationUtilities.ToString(descriptor.Name, descriptor.NameLength);
-            handler.DisplayName = AllocationUtilities.ToString(descriptor.DisplayName, descriptor.DisplayNameLength);
-            handler.Tags = AllocationUtilities.ToStringArray(descriptor.Tags, descriptor.TagsCount);
-            handler.Summary = AllocationUtilities.ToString(descriptor.Summary, descriptor.SummaryLength);
-            handler.GroupName = AllocationUtilities.ToString(descriptor.GroupName, descriptor.GroupNameLength);
+            return new(name, displayName, tags, summary, groupName);
         }
 
-        private static unsafe void AsRoutedHandler(this EndpointHandler handler, in EndpointHandlerDescriptor descriptor)
+        private static unsafe HandlerRoutingInfo? GetRoutingInfo(ref EndpointHandlerDescriptor descriptor)
         {
-            handler.IsRoutedHandler = descriptor.IsRoutedHandler > 0;
+            if (descriptor.IsRoutedHandler == 0)
+                return null;
 
-            if (!handler.IsRoutedHandler)
-                return;
-
-            handler.Priority = descriptor.Priority;
-
-            handler.Hosts = AllocationUtilities.ToStringArray(descriptor.Hosts, descriptor.HostsCount);
+            return new(
+                descriptor.Priority,
+                AllocationUtilities.ToStringArray(descriptor.Hosts, descriptor.HostsCount)
+            );
         }
     }
 }

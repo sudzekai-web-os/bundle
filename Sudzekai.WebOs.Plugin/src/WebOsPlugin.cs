@@ -58,7 +58,7 @@ namespace Sudzekai.WebOs.Plugin
 
                     var logger = Services.GetRequiredService<ILoggerFactory>().CreateLogger(type.ToString());
 
-                    var result = handler.Handle(request).GetAwaiter().GetResult();
+                    var result = handler.HandleAsync(request).GetAwaiter().GetResult();
 
                     if (result.ContentType is ContentType.ApplicationJson)
                     {

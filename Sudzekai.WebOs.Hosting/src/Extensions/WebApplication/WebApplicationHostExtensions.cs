@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Sudzekai.WebOs.Core;
 
 namespace Sudzekai.WebOs.Hosting
 {
@@ -17,20 +18,19 @@ namespace Sudzekai.WebOs.Hosting
             public void AddHandlers()
             {
                 var registry = app.Services.GetRequiredService<PluginsRegistry>();
-                var registerer = app.Services.GetRequiredService<PluginHandlersRegisterer>();
+                var registerer = new PluginHandlersRegisterer(app);
 
                 var plugins = registry.GetPluginsList();
 
                 foreach (var plugin in plugins)
-                    registerer.RegisterHandlers(app, plugin);
-            }
+                    registerer.RegisterHandlers(plugin);
 
-            public void UnloadPlugins()
-            {
-                var registry = app.Services.GetRequiredService<PluginsRegistry>();
-                var registerer = app.Services.GetRequiredService<PluginHandlersRegisterer>();
-                
-                registry.UnloadPlugins();
+                using var scope = app.Services.CreateScope();
+
+                var internalHandlers = scope.ServiceProvider.GetServices<IEndpointHandler>();
+
+                foreach (var handler in internalHandlers) 
+                    registerer.RegisterHandler(handler, "Internal");
             }
 
             public IReadOnlyList<Plugin> GetPluginsList()

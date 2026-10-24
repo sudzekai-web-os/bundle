@@ -1,6 +1,5 @@
 ﻿using Sudzekai.WebOs.Core;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace Sudzekai.WebOs.Plugin
 {
@@ -17,7 +16,7 @@ namespace Sudzekai.WebOs.Plugin
             EndpointHandlerCallbacksContainer.Fix(descriptor.HandleFunc, describedHandleFunc);
         }
 
-        public static unsafe EndpointHandlerDescriptor ToDescriptor(this IEndpointHandler handler)
+        public static EndpointHandlerDescriptor ToDescriptor(this IEndpointHandler handler)
         {
             EndpointHandlerDescriptor result = new()
             {
@@ -26,66 +25,76 @@ namespace Sudzekai.WebOs.Plugin
                 HttpMethod = (int)handler.HttpMethod
             };
 
-            if (handler is IAuthorizedEndpointHandler authorizedHandler)
-                ConfigureAuthorizedHandler(ref result, authorizedHandler);
+            ConfigureAuthorizedHandler(ref result, handler.AuthorizationInfo);
 
-            if (handler is IFilteredEndpointHandler filteredHandler)
-                ConfigureFilteredHandler(ref result, filteredHandler);
+            ConfigureFilteredHandler(ref result, handler.FilteringInfo);
 
-            if (handler is ILimitedEndpointHandler limitedHandler)
-                ConfigureLimitedHandler(ref result, limitedHandler);
+            ConfigureLimitedHandler(ref result, handler.LimitingInfo);
 
-            if (handler is IOpenApiEndpointHandler openApiHandler)
-                ConfigureOpenApiHandler(ref result, openApiHandler);
+            ConfigureOpenApiHandler(ref result, handler.OpenApiInfo);
 
-            if (handler is IRoutedEndpointHandler routedHandler)
-                ConfigureRoutedHandler(ref result, routedHandler);
+            ConfigureRoutedHandler(ref result, handler.RoutingInfo);
 
             return result;
         }
 
-        private static unsafe void ConfigureOpenApiHandler(ref EndpointHandlerDescriptor descriptor, IOpenApiEndpointHandler openApiHandler)
+        private static unsafe void ConfigureOpenApiHandler(ref EndpointHandlerDescriptor descriptor, HandlerOpenApiInfo? info)
         {
+            if (info is null)
+                return;
+
             descriptor.IsOpenApiHandler = 1;
-            descriptor.Name = AllocationUtilities.AllocString(openApiHandler.Name, out var nameLength);
+            descriptor.Name = AllocationUtilities.AllocString(info.Name, out var nameLength);
             descriptor.NameLength = nameLength;
 
-            descriptor.DisplayName = AllocationUtilities.AllocString(openApiHandler.DisplayName, out var displayNameLength);
+            descriptor.DisplayName = AllocationUtilities.AllocString(info.DisplayName, out var displayNameLength);
             descriptor.DisplayNameLength = displayNameLength;
 
-            descriptor.Tags = AllocationUtilities.AllocStringArray(openApiHandler.Tags, out var count);
+            descriptor.Tags = AllocationUtilities.AllocStringArray(info.Tags, out var count);
             descriptor.TagsCount = count;
 
-            descriptor.Summary = AllocationUtilities.AllocString(openApiHandler.Summary, out var summaryLength);
+            descriptor.Summary = AllocationUtilities.AllocString(info.Summary, out var summaryLength);
             descriptor.SummaryLength = summaryLength;
 
-            descriptor.GroupName = AllocationUtilities.AllocString(openApiHandler.GroupName, out var groupNameLength);
+            descriptor.GroupName = AllocationUtilities.AllocString(info.GroupName, out var groupNameLength);
             descriptor.GroupNameLength = groupNameLength;
         }
 
-        private static void ConfigureLimitedHandler(ref EndpointHandlerDescriptor descriptor, ILimitedEndpointHandler limitedHandler)
+        private static void ConfigureLimitedHandler(ref EndpointHandlerDescriptor descriptor, HandlerLimitingInfo? info)
         {
+            if (info is null)
+                return;
+
             descriptor.IsLimitedHandler = 1;
-            descriptor.RateLimitingPolicy = (int)limitedHandler.RateLimitingPolicy;
+            descriptor.RateLimitingPolicy = (int)info.RateLimitingPolicy;
         }
 
-        private static void ConfigureAuthorizedHandler(ref EndpointHandlerDescriptor descriptor, IAuthorizedEndpointHandler authorizedHandler)
+        private static void ConfigureAuthorizedHandler(ref EndpointHandlerDescriptor descriptor, HandlerAuthorizationInfo? info)
         {
+            if (info is null)
+                return;
+
             descriptor.IsAuthorizedHandler = 1;
-            foreach (var role in authorizedHandler.RequiredRoles)
+            foreach (var role in info.RequiredRoles)
                 descriptor.RequiredRoles |= (int)role;
         }
 
-        private static void ConfigureFilteredHandler(ref EndpointHandlerDescriptor descriptor, IFilteredEndpointHandler filteredHandler)
+        private static void ConfigureFilteredHandler(ref EndpointHandlerDescriptor descriptor, HandlerFilteringInfo? info)
         {
+            if (info is null)
+                return;
+
             descriptor.IsFilteredHandler = 1;
         }
 
-        private static unsafe void ConfigureRoutedHandler(ref EndpointHandlerDescriptor descriptor, IRoutedEndpointHandler routedHandler)
+        private static unsafe void ConfigureRoutedHandler(ref EndpointHandlerDescriptor descriptor, HandlerRoutingInfo? info)
         {
+            if (info is null)
+                return;
+
             descriptor.IsRoutedHandler = 1;
-            descriptor.Priority = routedHandler.Priority;
-            descriptor.Hosts = AllocationUtilities.AllocStringArray(routedHandler.Hosts, out var count);
+            descriptor.Priority = info.Priority;
+            descriptor.Hosts = AllocationUtilities.AllocStringArray(info.Hosts, out var count);
             descriptor.HostsCount = count;
         }
 

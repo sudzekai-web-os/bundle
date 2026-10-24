@@ -8,7 +8,7 @@ namespace Sudzekai.WebOs.Hosting
 
         public PluginInfo Info { get; internal set; } = new();
 
-        public EndpointHandler[] Handlers { get; internal set; } = [];
+        public IEndpointHandler[] Handlers { get; internal set; } = [];
 
         internal Action? DisposeFunc { get; set; }
 

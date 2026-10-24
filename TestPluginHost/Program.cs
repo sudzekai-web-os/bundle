@@ -1,6 +1,9 @@
+using Sudzekai.WebOs.Core;
 using Sudzekai.WebOs.Hosting;
+using Sudzekai.WebOs.Hosting.src.Extensions.ServiceCollection;
 using System.Diagnostics.CodeAnalysis;
 using TestPluginHost.ConsoleFormatting;
+using TestPluginHost.Handlers;
 
 namespace TestPluginHost
 {
@@ -12,8 +15,11 @@ namespace TestPluginHost
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.ConfigureRateLimiting();
+
             builder.Services.AddAuthentication();
             builder.Services.AddAuthorization();
+            
             builder.AddPluginInfrastructure();
 
             builder.Logging.AddConsoleFormatter<ColorfulConsoleFormatter, ColorfulConsoleFormatterOptions>();
@@ -23,6 +29,8 @@ namespace TestPluginHost
             {
                 c.FormatterName = "Toolkit";
             });
+
+            builder.Services.AddScoped<IEndpointHandler, InternalHandler>();
 
             var app = builder.Build();
 

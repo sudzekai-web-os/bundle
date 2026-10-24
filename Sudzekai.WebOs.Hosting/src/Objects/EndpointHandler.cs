@@ -2,54 +2,47 @@
 
 namespace Sudzekai.WebOs.Hosting
 {
-    public class EndpointHandler
+    public class EndpointHandler : IEndpointHandler
     {
-        public string Pattern { get; internal set; } = string.Empty;
-
-        public HandlerHttpMethod HttpMethod { get; internal set; }
-
-        internal Func<HandlerRequest, HandlerResult> HandleFunc { get; set; } = default!;
-
-        internal async Task<HandlerResult> HandleAsync(HandlerRequest request)
+        internal EndpointHandler(string pattern, HandlerHttpMethod method, Func<HandlerRequest, HandlerResult> handleFunc)
         {
-            return HandleFunc(request);
+            Pattern = pattern;
+            HttpMethod = method;
+            HandleFunc = handleFunc;
         }
 
-        // Authorized
-        public bool IsAuthorizedHandler { get; internal set; }
+        internal void WithAuthorization(HandlerAuthorizationInfo? info)
+            => AuthorizationInfo = info;
 
-        public ClientRole[] RequiredRoles { get; internal set; } = [];
+        internal void WithFilter(HandlerFilteringInfo? info)
+            => FilteringInfo = info;
 
+        internal void WithLimiting(HandlerLimitingInfo? info)
+            => LimitingInfo = info;
 
-        // Filtered
-        public bool IsFilteredHandler { get; internal set; }
+        internal void WithOpenApi(HandlerOpenApiInfo? info)
+            => OpenApiInfo = info;
 
+        internal void WithRouting(HandlerRoutingInfo? info)
+            => RoutingInfo = info;
 
-        // RateLimitng
-        public bool IsLimitedHandler { get; internal set; }
+        public string Pattern { get; }
 
-        public RateLimitingPolicy RateLimitingPolicy { get; internal set; }
+        public HandlerHttpMethod HttpMethod { get; }
 
+        public HandlerAuthorizationInfo? AuthorizationInfo { get; private set; }
 
-        // OpenApi
-        public bool IsOpenApiHandler { get; internal set; }
+        public HandlerFilteringInfo? FilteringInfo { get; private set; }
 
-        public string Name { get; internal set; } = string.Empty;
+        public HandlerLimitingInfo? LimitingInfo { get; private set; }
 
-        public string DisplayName { get; internal set; } = string.Empty;
+        public HandlerOpenApiInfo? OpenApiInfo { get; private set; }
 
-        public string[] Tags { get; internal set; } = [];
+        public HandlerRoutingInfo? RoutingInfo { get; private set; }
 
-        public string Summary { get; internal set; } = string.Empty;
+        internal Func<HandlerRequest, HandlerResult> HandleFunc { get; }
 
-        public string GroupName { get; internal set; } = string.Empty;
-
-
-        // Routed
-        public bool IsRoutedHandler { get; internal set; }
-
-        public int Priority { get; internal set; }
-
-        public string[] Hosts { get; internal set; } = [];
+        public Task<HandlerResult> HandleAsync(HandlerRequest request)
+            => Task.FromResult(HandleFunc(request));
     }
 }

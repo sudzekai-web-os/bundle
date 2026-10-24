@@ -17,7 +17,7 @@ namespace TestPlugin.Handlers
 
         public HandlerHttpMethod HttpMethod => HandlerHttpMethod.Get;
 
-        public Task<HandlerResult> Handle(HandlerRequest request)
+        public Task<HandlerResult> HandleAsync(HandlerRequest request)
         {
             _logger.LogInformation(request.ToString());
 

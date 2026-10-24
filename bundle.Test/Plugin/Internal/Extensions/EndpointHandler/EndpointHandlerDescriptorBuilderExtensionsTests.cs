@@ -121,37 +121,26 @@ namespace bundle.Test.Plugin
             }
         }
 
-        private sealed class FullHandler :
-            IAuthorizedEndpointHandler,
-            IFilteredEndpointHandler,
-            ILimitedEndpointHandler,
-            IOpenApiEndpointHandler,
-            IRoutedEndpointHandler
+        private sealed class FullHandler : IEndpointHandler
         {
             public string Pattern => "/api/items/{id}";
 
             public HandlerHttpMethod HttpMethod => HandlerHttpMethod.Patch;
 
-            public ClientRole[] RequiredRoles =>
-                [ClientRole.Administrator, ClientRole.User, ClientRole.Viewer];
+            public HandlerAuthorizationInfo? AuthorizationInfo =>
+                new([ClientRole.Administrator, ClientRole.User, ClientRole.Viewer]);
 
-            public RateLimitingPolicy RateLimitingPolicy => RateLimitingPolicy.Strict;
+            public HandlerFilteringInfo? FilteringInfo => new(true);
 
-            public string Name => "GetItem";
+            public HandlerLimitingInfo? LimitingInfo => new(RateLimitingPolicy.Strict);
 
-            public string DisplayName => "Get item";
+            public HandlerOpenApiInfo? OpenApiInfo =>
+                new("GetItem", "Get item", ["items", "read"], "Returns an item", "Items");
 
-            public string[] Tags => ["items", "read"];
+            public HandlerRoutingInfo? RoutingInfo =>
+                new(7, ["api.example.org", "www.example.org"]);
 
-            public string Summary => "Returns an item";
-
-            public string GroupName => "Items";
-
-            public int Priority => 7;
-
-            public string[] Hosts => ["api.example.org", "www.example.org"];
-
-            public Task<HandlerResult> Handle(HandlerRequest request)
+            public Task<HandlerResult> HandleAsync(HandlerRequest request)
                 => Task.FromResult(HandlerResult.Create(HttpStatusCode.OK));
         }
 
@@ -161,7 +150,17 @@ namespace bundle.Test.Plugin
 
             public HandlerHttpMethod HttpMethod => HandlerHttpMethod.Get;
 
-            public Task<HandlerResult> Handle(HandlerRequest request)
+            public HandlerAuthorizationInfo? AuthorizationInfo => null;
+
+            public HandlerFilteringInfo? FilteringInfo => null;
+
+            public HandlerLimitingInfo? LimitingInfo => null;
+
+            public HandlerOpenApiInfo? OpenApiInfo => null;
+
+            public HandlerRoutingInfo? RoutingInfo => null;
+
+            public Task<HandlerResult> HandleAsync(HandlerRequest request)
                 => Task.FromResult(HandlerResult.Create(HttpStatusCode.OK));
         }
     }

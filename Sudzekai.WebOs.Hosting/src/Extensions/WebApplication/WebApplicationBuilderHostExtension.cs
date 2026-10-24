@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Sudzekai.WebOs.Hosting.src.Objects;
 
 namespace Sudzekai.WebOs.Hosting
 {
@@ -13,8 +14,6 @@ namespace Sudzekai.WebOs.Hosting
                 builder.Services.AddTransient<PluginLoader>();
 
                 builder.Services.AddSingleton<PluginHost>();
-
-                builder.Services.AddSingleton<PluginHandlersRegisterer>();
             }
         }
     }

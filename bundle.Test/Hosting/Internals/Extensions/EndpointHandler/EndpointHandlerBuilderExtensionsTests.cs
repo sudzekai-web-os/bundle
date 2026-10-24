@@ -22,11 +22,14 @@ namespace bundle.Test.Hosting
                 Assert.Equal(HandlerHttpMethod.Get, handler.HttpMethod);
                 Assert.NotNull(handler.HandleFunc);
 
-                Assert.False(handler.IsAuthorizedHandler);
-                Assert.False(handler.IsFilteredHandler);
-                Assert.False(handler.IsLimitedHandler);
-                Assert.False(handler.IsOpenApiHandler);
-                Assert.False(handler.IsRoutedHandler);
+                Assert.Null(handler.AuthorizationInfo);
+
+                Assert.NotNull(handler.FilteringInfo);
+                Assert.False(handler.FilteringInfo!.IsEnabled);
+
+                Assert.Null(handler.LimitingInfo);
+                Assert.Null(handler.OpenApiInfo);
+                Assert.Null(handler.RoutingInfo);
 
                 var result = await handler.HandleAsync(new HandlerRequest
                 {
@@ -54,26 +57,27 @@ namespace bundle.Test.Hosting
                 Assert.Equal("/api/items/{id}", handler.Pattern);
                 Assert.Equal(HandlerHttpMethod.Patch, handler.HttpMethod);
 
-                Assert.True(handler.IsAuthorizedHandler);
+                Assert.NotNull(handler.AuthorizationInfo);
                 Assert.Equal(
                     new[] { ClientRole.Administrator, ClientRole.User, ClientRole.Viewer },
-                    handler.RequiredRoles);
+                    handler.AuthorizationInfo!.RequiredRoles);
 
-                Assert.True(handler.IsFilteredHandler);
+                Assert.NotNull(handler.FilteringInfo);
+                Assert.True(handler.FilteringInfo!.IsEnabled);
 
-                Assert.True(handler.IsLimitedHandler);
-                Assert.Equal(RateLimitingPolicy.Strict, handler.RateLimitingPolicy);
+                Assert.NotNull(handler.LimitingInfo);
+                Assert.Equal(RateLimitingPolicy.Strict, handler.LimitingInfo!.RateLimitingPolicy);
 
-                Assert.True(handler.IsOpenApiHandler);
-                Assert.Equal("GetItem", handler.Name);
-                Assert.Equal("Get item", handler.DisplayName);
-                Assert.Equal(new[] { "items", "read" }, handler.Tags);
-                Assert.Equal("Returns an item", handler.Summary);
-                Assert.Equal("Items", handler.GroupName);
+                Assert.NotNull(handler.OpenApiInfo);
+                Assert.Equal("GetItem", handler.OpenApiInfo!.Name);
+                Assert.Equal("Get item", handler.OpenApiInfo.DisplayName);
+                Assert.Equal(new[] { "items", "read" }, handler.OpenApiInfo.Tags);
+                Assert.Equal("Returns an item", handler.OpenApiInfo.Summary);
+                Assert.Equal("Items", handler.OpenApiInfo.GroupName);
 
-                Assert.True(handler.IsRoutedHandler);
-                Assert.Equal(7, handler.Priority);
-                Assert.Equal(new[] { "api.example.org", "www.example.org" }, handler.Hosts);
+                Assert.NotNull(handler.RoutingInfo);
+                Assert.Equal(7, handler.RoutingInfo!.Priority);
+                Assert.Equal(new[] { "api.example.org", "www.example.org" }, handler.RoutingInfo.Hosts);
             }
             finally
             {
