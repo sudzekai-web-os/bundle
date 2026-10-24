@@ -25,10 +25,7 @@ namespace Sudzekai.WebOs.Hosting
 
         private static unsafe void AsDefaultHandler(this EndpointHandler handler, ref EndpointHandlerDescriptor descriptor)
         {
-            string pattern;
-
-            fixed (byte* p = descriptor.Pattern)
-                pattern = AllocationUtilities.PatternToString(p);
+            var pattern = AllocationUtilities.ToString(descriptor.Pattern, descriptor.PatternLength);
 
             var method = (HandlerHttpMethod)descriptor.HttpMethod;
 

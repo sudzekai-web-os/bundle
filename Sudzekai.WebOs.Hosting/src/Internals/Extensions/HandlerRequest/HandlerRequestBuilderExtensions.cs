@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Sudzekai.WebOs.Core;
+using System.Globalization;
 
 namespace Sudzekai.WebOs.Hosting
 {
@@ -8,14 +9,32 @@ namespace Sudzekai.WebOs.Hosting
         extension(HandlerRequest)
         {
             public static async Task<HandlerRequest> FromHttpRequest(HttpRequest request)
-                => new()
+            {
+                using var ms = new MemoryStream();
+
+                await request.Body.CopyToAsync(ms);
+
+                var body = ms.ToArray();
+
+                return new()
                 {
                     HttpMethod = ToMethod(request.Method),
+                    
+                    Host = request.Host.Value,
                     Path = request.Path,
+                    Scheme = request.Scheme,
+                    
                     QueryString = request.QueryString.Value ?? "",
-                    Headers = [.. request.Headers.Select(ToHeaderEntry)],
-                    Body = await ReadBodyAsync(request.Body),
+                    
+                    RouteValues = request.RouteValues.ToDictionary(kv => kv.Key, kv => kv.Value?.ToString() ?? string.Empty),
+                    Headers = request.Headers.ToDictionary(kv => kv.Key, kv => kv.Value.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s!).ToArray()),
+                    Cookies = request.Cookies.ToDictionary(kv => kv.Key, kv => kv.Value),
+                    Claims = request.HttpContext.User.Claims.GroupBy(c => c.Type).ToDictionary(g => g.Key, g => g.Select(c => c.Value).ToArray()),
+
+                    ContentType = request.ContentType,
+                    Body = body
                 };
+            }
         }
 
         private static HandlerHttpMethod ToMethod(string method)
@@ -29,20 +48,5 @@ namespace Sudzekai.WebOs.Hosting
                 _ => throw new NotSupportedException("Был получен неподдерживаемый http method")
             };
 
-        private static HeaderEntry ToHeaderEntry(KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues> kv)
-            => new()
-            {
-                Key = kv.Key,
-                Values = [.. kv.Value.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s!)]
-            };
-
-        private static async Task<byte[]> ReadBodyAsync(Stream body)
-        {
-            if (body == null) return [];
-
-            using var ms = new MemoryStream();
-            await body.CopyToAsync(ms);
-            return ms.ToArray();
-        }
     }
 }

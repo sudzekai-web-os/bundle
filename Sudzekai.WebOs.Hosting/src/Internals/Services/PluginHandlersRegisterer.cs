@@ -146,7 +146,7 @@ namespace Sudzekai.WebOs.Hosting
 
                 var request = await HandlerRequest.FromHttpRequest(ctx.Request);
 
-                logger.LogDebug("Получен {HttpMethod} запрос на {Path}", request.HttpMethod.ToString(), request.Path);
+                logger.LogDebug("{request}", request.ToString());
 
                 var result = await handler.HandleAsync(request);
 

@@ -3,7 +3,7 @@
 namespace Sudzekai.WebOs.Core
 {
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct HeaderEntryDescriptor : IDisposable
+    public unsafe struct StringArrayEntryDescriptor : IDisposable
     {
         public nint Key; public int KeyLength;
 

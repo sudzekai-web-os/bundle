@@ -19,17 +19,12 @@ namespace Sudzekai.WebOs.Plugin
 
         public static unsafe EndpointHandlerDescriptor ToDescriptor(this IEndpointHandler handler)
         {
-            EndpointHandlerDescriptor result = new();
-
-            var bytes = Encoding.UTF8.GetBytes(handler.Pattern);
-            fixed (byte* p = bytes)
+            EndpointHandlerDescriptor result = new()
             {
-                int len = Math.Min(bytes.Length, 255);
-                Buffer.MemoryCopy(p, result.Pattern, 256, len);
-                result.Pattern[len] = 0;
-            }
-
-            result.HttpMethod = (int)handler.HttpMethod;
+                Pattern = AllocationUtilities.AllocString(handler.Pattern, out var patternLength),
+                PatternLength = patternLength,
+                HttpMethod = (int)handler.HttpMethod
+            };
 
             if (handler is IAuthorizedEndpointHandler authorizedHandler)
                 ConfigureAuthorizedHandler(ref result, authorizedHandler);
@@ -52,14 +47,20 @@ namespace Sudzekai.WebOs.Plugin
         private static unsafe void ConfigureOpenApiHandler(ref EndpointHandlerDescriptor descriptor, IOpenApiEndpointHandler openApiHandler)
         {
             descriptor.IsOpenApiHandler = 1;
-            descriptor.Name = string.IsNullOrWhiteSpace(openApiHandler.Name) ? nint.Zero : Marshal.StringToCoTaskMemUTF8(openApiHandler.Name);
-            descriptor.DisplayName = string.IsNullOrWhiteSpace(openApiHandler.DisplayName) ? nint.Zero : Marshal.StringToCoTaskMemUTF8(openApiHandler.DisplayName);
+            descriptor.Name = AllocationUtilities.AllocString(openApiHandler.Name, out var nameLength);
+            descriptor.NameLength = nameLength;
+
+            descriptor.DisplayName = AllocationUtilities.AllocString(openApiHandler.DisplayName, out var displayNameLength);
+            descriptor.DisplayNameLength = displayNameLength;
 
             descriptor.Tags = AllocationUtilities.AllocStringArray(openApiHandler.Tags, out var count);
             descriptor.TagsCount = count;
 
-            descriptor.Summary = string.IsNullOrWhiteSpace(openApiHandler.Summary) ? nint.Zero : Marshal.StringToCoTaskMemUTF8(openApiHandler.Summary);
-            descriptor.GroupName = string.IsNullOrWhiteSpace(openApiHandler.GroupName) ? nint.Zero : Marshal.StringToCoTaskMemUTF8(openApiHandler.GroupName);
+            descriptor.Summary = AllocationUtilities.AllocString(openApiHandler.Summary, out var summaryLength);
+            descriptor.SummaryLength = summaryLength;
+
+            descriptor.GroupName = AllocationUtilities.AllocString(openApiHandler.GroupName, out var groupNameLength);
+            descriptor.GroupNameLength = groupNameLength;
         }
 
         private static void ConfigureLimitedHandler(ref EndpointHandlerDescriptor descriptor, ILimitedEndpointHandler limitedHandler)

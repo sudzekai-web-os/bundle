@@ -6,7 +6,7 @@ namespace Sudzekai.WebOs.Core
     public unsafe struct EndpointHandlerDescriptor : IDisposable
     {
         // Base
-        public fixed byte Pattern[256];
+        public nint Pattern; public int PatternLength;
 
         public int HttpMethod;
 
@@ -53,18 +53,13 @@ namespace Sudzekai.WebOs.Core
 
         public void Dispose()
         {
-            // HandleFunc — адрес функции (stub-делегата), НЕ память CoTaskMem.
-            // Освобождать его как память нельзя (FreeCoTaskMem на адресе кода -> AccessViolation).
-            // Удерживается контейнером колбэков в плагине; при необходимости отпускается там же.
-
+            AllocationUtilities.FreeIfAllocated(ref Pattern);
             AllocationUtilities.FreeIfAllocated(ref Name);
             AllocationUtilities.FreeIfAllocated(ref DisplayName);
             AllocationUtilities.FreeIfAllocated(ref Summary);
             AllocationUtilities.FreeIfAllocated(ref GroupName);
             AllocationUtilities.FreeStringArray(Hosts, HostsCount);
             AllocationUtilities.FreeStringArray(Tags, TagsCount);
-
-            HandleFunc = nint.Zero;
         }
     }
 }

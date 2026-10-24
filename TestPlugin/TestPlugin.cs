@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Sudzekai.WebOs.Core;
 using Sudzekai.WebOs.Plugin;
 using System.Runtime.InteropServices;
+using TestPlugin.Handlers;
 
 namespace TestPlugin
 {
@@ -22,7 +23,9 @@ namespace TestPlugin
                 Version = "0.0.1",
                 Summary = "Тестовый плагин предоставляющий роут /health"
             });
-            _builder.Services.AddScoped<TestHandler>();
+
+            _builder.Services.AddScoped<GetHandler>();
+            _builder.Services.AddScoped<QueriedHandler>();
 
             return 0;
         }

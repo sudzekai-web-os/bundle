@@ -2,13 +2,13 @@
 using Sudzekai.WebOs.Core;
 using Sudzekai.WebOs.Plugin;
 
-namespace TestPlugin
+namespace TestPlugin.Handlers
 {
-    public class TestHandler : IEndpointHandler
+    public class GetHandler : IEndpointHandler
     {
-        private readonly ILogger<TestHandler> _logger;
+        private readonly ILogger<GetHandler> _logger;
 
-        public TestHandler(ILogger<TestHandler> logger)
+        public GetHandler(ILogger<GetHandler> logger)
         {
             _logger = logger;
         }
@@ -19,7 +19,7 @@ namespace TestPlugin
 
         public Task<HandlerResult> Handle(HandlerRequest request)
         {
-            _logger.LogInformation("test handler handled");
+            _logger.LogInformation(request.ToString());
 
             return Task.FromResult(HandlerResult.Ok().WithData("I am alive"));
         }

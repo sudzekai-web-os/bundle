@@ -5,18 +5,6 @@ namespace Sudzekai.WebOs.Core
 {
     public static unsafe class AllocationUtilities
     {
-        public static string PatternToString(byte* pattern)
-        {
-            if (pattern == null) return string.Empty;
-
-            int len = 0;
-            while (len < 256 && pattern[len] != 0) len++;
-
-            if (len == 0) return string.Empty;
-
-            return Encoding.UTF8.GetString(pattern, len);
-        }
-
         /// <summary>
         /// Выделяет массив UTF8-строк (null-terminated) в CoTaskMem.
         /// Возвращает null при пустом списке.
@@ -117,30 +105,6 @@ namespace Sudzekai.WebOs.Core
             Marshal.FreeCoTaskMem((nint)arrayPtr);
         }
 
-        /// <summary>
-        /// Освобождает массив unmanaged-структур
-        /// </summary>
-        public static void FreeArray<T>(T* arrayPtr) where T : unmanaged
-        {
-            if (arrayPtr == null) return;
-
-            Marshal.FreeCoTaskMem((nint)arrayPtr);
-        }
-
-        /// <summary>
-        /// Освобождает массив элементов, каждый из которых требует собственного
-        /// освобождения
-        /// </summary>
-        public static void FreeArray<T>(T* arrayPtr, int count, Action<T> freeElement) where T : unmanaged
-        {
-            if (arrayPtr == null) return;
-
-            for (int i = 0; i < count; i++)
-                freeElement(arrayPtr[i]);
-
-            Marshal.FreeCoTaskMem((nint)arrayPtr);
-        }
-
         public static void FreeIfAllocated(ref nint obj)
         {
             if (obj != nint.Zero)
@@ -163,20 +127,6 @@ namespace Sudzekai.WebOs.Core
         }
 
         /// <summary>
-        /// Читает null-terminated UTF8-строку из unmanaged-памяти.
-        /// </summary>
-        public static string ToString(nint ptr)
-        {
-            if (ptr == nint.Zero)
-                return string.Empty;
-
-            int len = 0;
-            while (((byte*)ptr)[len] != 0) len++;
-
-            return len == 0 ? string.Empty : Encoding.UTF8.GetString((byte*)ptr, len);
-        }
-
-        /// <summary>
         /// Читает массив UTF8-строк (null-terminated) из unmanaged-памяти в managed-массив.
         /// </summary>
         public static string[] ToStringArray(nint* arrayPtr, int count)
@@ -187,8 +137,23 @@ namespace Sudzekai.WebOs.Core
             var result = new string[count];
 
             for (int i = 0; i < count; i++)
-                result[i] = ToString(arrayPtr[i]);
+            {
+                var ptr = arrayPtr[i];
+                if (ptr == nint.Zero)
+                    continue;
 
+                int len = 0;
+                
+                while (((byte*)ptr)[len] != 0) 
+                    len++;
+
+                if (len == 0)
+                    continue;
+
+
+                result[i] = Encoding.UTF8.GetString((byte*)ptr, len);
+            }    
+            
             return result;
         }
 
