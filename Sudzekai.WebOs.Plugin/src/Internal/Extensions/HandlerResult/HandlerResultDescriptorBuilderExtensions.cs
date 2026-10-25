@@ -1,6 +1,4 @@
 ﻿using Sudzekai.WebOs.Core;
-using System.Runtime.InteropServices;
-using System.Text;
 
 namespace Sudzekai.WebOs.Plugin
 {
@@ -8,7 +6,15 @@ namespace Sudzekai.WebOs.Plugin
     {
         public static HandlerResultDescriptor ToDescriptor(this HandlerResult result)
         {
-            var data = AllocationUtilities.AllocString(result.Data, out var dataLength);
+            string str = result.Data switch
+            {
+                null => string.Empty,
+                string s => s,
+                IFormattable f => f.ToString(null, System.Globalization.CultureInfo.InvariantCulture) ?? string.Empty,
+                _ => result.Data.ToString() ?? string.Empty
+            };
+
+            var data = AllocationUtilities.AllocString(str, out var dataLength);
             return new(result.StatusCode, data, dataLength, (int)result.ContentType);
         }
     }

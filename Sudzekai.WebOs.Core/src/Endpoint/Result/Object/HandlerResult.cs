@@ -16,7 +16,7 @@ namespace Sudzekai.WebOs.Core
 
         public ContentType ContentType { get; private set; }
 
-        public string? Data { get; private set; }
+        public object? Data { get; private set; }
 
         public JsonTypeInfo? JsonTypeInfo { get; private set; }
 
@@ -24,7 +24,7 @@ namespace Sudzekai.WebOs.Core
         public static HandlerResult Create(HttpStatusCode statusCode)
             => new((int)statusCode);
 
-        public HandlerResult WithData(string? data)
+        public HandlerResult WithData(object? data)
         {
             Data = data;
             return this;

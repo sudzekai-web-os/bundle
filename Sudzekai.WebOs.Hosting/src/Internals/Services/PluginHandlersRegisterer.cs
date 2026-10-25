@@ -66,7 +66,7 @@ namespace Sudzekai.WebOs.Hosting
                 var result = await handler.HandleAsync(request);
 
                 ctx.Response.StatusCode = result.StatusCode;
-                ctx.Response.ContentType = result.ContentType.ToBusinessString();
+                ctx.Response.ContentType = result.ContentType.ToBusinessString() + "; charset=utf-8";
                 await ctx.Response.WriteAsync(result.Data?.ToString() ?? "", Encoding.UTF8);
             };
     }

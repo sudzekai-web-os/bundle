@@ -54,16 +54,14 @@ namespace Sudzekai.WebOs.Plugin
 
                 descriptor.SetHandler((request) =>
                 {
-                    var handler = (IEndpointHandler)Services.GetRequiredService(type)!;
-
                     var logger = Services.GetRequiredService<ILoggerFactory>().CreateLogger(type.ToString());
+
+                    var handler = (IEndpointHandler)Services.GetRequiredService(type)!;
 
                     var result = handler.HandleAsync(request).GetAwaiter().GetResult();
 
                     if (result.ContentType is ContentType.ApplicationJson)
                     {
-                        logger.LogInformation("Получен запрос");
-
                         if (result.JsonTypeInfo is null)
                             throw new InvalidOperationException($"у метода обработки обработчика типа {type} возвращаемый тип данных - application/json, но JsonTypeInfo не был указан");
 
