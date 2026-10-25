@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System.Threading.RateLimiting;
 
-namespace Sudzekai.WebOs.Hosting.src.Internals.Objects
+namespace Sudzekai.WebOs.Hosting
 {
     internal class RateLimitingPoliciesDefaults
     {

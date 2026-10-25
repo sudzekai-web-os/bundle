@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Sudzekai.WebOs.Core.src.Endpoint.Request.Descriptors
+namespace Sudzekai.WebOs.Core
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct StringEntryDescriptor

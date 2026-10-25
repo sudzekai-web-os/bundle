@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Sudzekai.WebOs.Hosting.src.Objects;
 
 namespace Sudzekai.WebOs.Hosting
 {

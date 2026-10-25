@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Sudzekai.WebOs.Core;
-using Sudzekai.WebOs.Hosting.src.Internals.Objects;
-using Sudzekai.WebOs.Hosting.src.Objects;
 
-namespace Sudzekai.WebOs.Hosting.src.Extensions.ServiceCollection
+namespace Sudzekai.WebOs.Hosting
 {
     public static class ServiceCollectionRateLimitingExtensions
     {

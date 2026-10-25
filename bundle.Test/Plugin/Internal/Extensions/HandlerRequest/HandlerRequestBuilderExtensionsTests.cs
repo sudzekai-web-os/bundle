@@ -1,5 +1,4 @@
 using Sudzekai.WebOs.Core;
-using Sudzekai.WebOs.Core.src.Endpoint.Request.Descriptors;
 using Sudzekai.WebOs.Plugin;
 
 namespace bundle.Test.Plugin
