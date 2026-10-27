@@ -68,7 +68,7 @@ namespace Sudzekai.WebOs.Hosting
             var rateLimitingPolicy = (RateLimitingPolicy)descriptor.RateLimitingPolicy;
 
             if (!Enum.IsDefined(rateLimitingPolicy))
-                throw new InvalidOperationException("дескриптор содержал невалидную политику ограничения");
+                throw new InvalidOperationException(LogsDictionary.EndpointHandlerBuilderExtensions.InvalidLimitingPolicy);
 
             return new(rateLimitingPolicy);
         }

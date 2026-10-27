@@ -45,7 +45,7 @@ namespace Sudzekai.WebOs.Hosting
                 "put" => HandlerHttpMethod.Put,
                 "patch" => HandlerHttpMethod.Patch,
                 "delete" => HandlerHttpMethod.Delete,
-                _ => throw new NotSupportedException("Был получен неподдерживаемый http method")
+                _ => throw new NotSupportedException(LogsDictionary.HandlerRequestBuilderExtensions.InvalidHttpMethod)
             };
 
     }

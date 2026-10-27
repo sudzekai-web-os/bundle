@@ -41,7 +41,7 @@ namespace Sudzekai.WebOs.Hosting
             
             var lib = NativeLibrary.Load(assemblyPath);
 
-            _logger.LogInformation("[{assemblyTag}] Начата загрузка плагина", assemblyTag);
+            _logger.LogInformation(LogsDictionary.PluginLoader.LoadingStarted, assemblyTag);
 
             var result = TryMain(lib);
 
@@ -54,10 +54,11 @@ namespace Sudzekai.WebOs.Hosting
                     ThrowInvalidExport(WebOsCoreContext.Exports.Main);
                     break;
                 case 3:
-                    throw new InvalidOperationException($"Внутренняя ошибка инициализации плагина {assemblyPath}");
+                    throw new InvalidOperationException(
+                        string.Format(LogsDictionary.PluginLoader.InitInternalError, assemblyPath));
             }
 
-            _logger.LogDebug("[{assemblyTag}] (1/6) Входная точка успешно обработана", assemblyTag);
+            _logger.LogDebug(LogsDictionary.PluginLoader.EntryPointProcessed, assemblyTag);
 
             result = TryDelegateLogging(lib, _logDelegatePtr);
 
@@ -70,10 +71,11 @@ namespace Sudzekai.WebOs.Hosting
                     ThrowInvalidExport(WebOsCoreContext.Exports.DelegateLogging);
                     break;
                 case 3:
-                    throw new InvalidOperationException($"Внутренняя ошибка делегирования логирования плагина {assemblyPath}");
+                    throw new InvalidOperationException(
+                        string.Format(LogsDictionary.PluginLoader.LoggingDelegateInternalError, assemblyPath));
             }
 
-            _logger.LogDebug("[{assemblyTag}] (2/6) Логирование успешно делегировано", assemblyTag);
+            _logger.LogDebug(LogsDictionary.PluginLoader.LoggingDelegated, assemblyTag);
             
             result = TryBuild(lib);
 
@@ -86,10 +88,11 @@ namespace Sudzekai.WebOs.Hosting
                     ThrowInvalidExport(WebOsCoreContext.Exports.Build);
                     break;
                 case 3:
-                    throw new InvalidOperationException($"Внутренняя ошибка сборки плагина {assemblyPath}");
+                    throw new InvalidOperationException(
+                        string.Format(LogsDictionary.PluginLoader.BuildInternalError, assemblyPath));
             }
 
-            _logger.LogDebug("[{assemblyTag}] (3/6) Плагин успешно собран", assemblyTag);
+            _logger.LogDebug(LogsDictionary.PluginLoader.PluginBuilt, assemblyTag);
 
             result = TryGetHandlers(lib, out var handlers);
 
@@ -103,7 +106,7 @@ namespace Sudzekai.WebOs.Hosting
                     break;
             }
 
-            _logger.LogDebug("[{assemblyTag}] (4/6) Получены обработчики плагина", assemblyTag);
+            _logger.LogDebug(LogsDictionary.PluginLoader.HandlersReceived, assemblyTag);
 
             result = TryGetInfo(lib, out var info);
 
@@ -117,7 +120,7 @@ namespace Sudzekai.WebOs.Hosting
                     break;
             }
 
-            _logger.LogDebug("[{assemblyTag}] (5/6) Получена информация о плагине", assemblyTag);
+            _logger.LogDebug(LogsDictionary.PluginLoader.InfoReceived, assemblyTag);
 
             result = TryGetDisposeFunc(lib, assemblyPath, out var disposeFunc);
 
@@ -131,9 +134,9 @@ namespace Sudzekai.WebOs.Hosting
                     break;
             }
 
-            _logger.LogDebug("[{assemblyTag}] (6/6) Получен делегат освобождающей функции плагина", assemblyTag);
+            _logger.LogDebug(LogsDictionary.PluginLoader.DisposeFuncReceived, assemblyTag);
 
-            _logger.LogInformation("[{assemblyTag}] Плагин успешно загружен", assemblyTag);
+            _logger.LogInformation(LogsDictionary.PluginLoader.PluginLoaded, assemblyTag);
 
             return new()
             {
@@ -145,10 +148,12 @@ namespace Sudzekai.WebOs.Hosting
         }
 
         private static void ThrowDoesntExport(string export)
-            => throw new InvalidOperationException($"Плагин не экспортирует \"{export}\"");
+            => throw new InvalidOperationException(
+                string.Format(LogsDictionary.PluginLoader.DoesntExport, export));
 
         private static void ThrowInvalidExport(string export)
-            => throw new InvalidOperationException($"Экспорт \"{export}\" плагина не соответствует контракту");
+            => throw new InvalidOperationException(
+                string.Format(LogsDictionary.PluginLoader.InvalidExport, export));
 
 
         private static int TryMain(nint lib)
@@ -299,7 +304,8 @@ namespace Sudzekai.WebOs.Hosting
                 var result = func();
 
                 if (result != 0)
-                    throw new InvalidOperationException($"внутренняя ошибка плагина {assemblyPath}: dispose вернул ненулевой код");
+                    throw new InvalidOperationException(
+                        string.Format(LogsDictionary.PluginLoader.DisposeInternalError, assemblyPath));
             };
 
             return 0;

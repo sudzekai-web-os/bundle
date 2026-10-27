@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Sudzekai.WebOs.Core;
+using System.Net;
 using System.Text;
 
 namespace Sudzekai.WebOs.Hosting
@@ -22,7 +23,7 @@ namespace Sudzekai.WebOs.Hosting
 
         public void RegisterHandlers(Plugin plugin)
         {
-            _logger.LogInformation("[{assemblyTag}] Регистрация обработчиков плагина...", plugin.Info.Name);
+            _logger.LogInformation(LogsDictionary.PluginHandlersRegisterer.PluginHandlersRegistrationStarted, plugin.Info.Name);
 
             int count = 0;
 
@@ -36,20 +37,20 @@ namespace Sudzekai.WebOs.Hosting
                 count++;
             }
 
-            _logger.LogInformation("[{assemblyTag}] Зарегистрировано {count} обработчиков плагина", assemblyTag, count);
+            _logger.LogInformation(LogsDictionary.PluginHandlersRegisterer.PluginHandlersRegistrationEnded, assemblyTag, count);
         }
 
         internal void RegisterHandler(IEndpointHandler handler, string assemblyTag)
         {
             var method = handler.HttpMethod.ToString().ToUpperInvariant();
 
-            _logger.LogInformation("[{assemblyTag}] Регистрация обработчика {method} -> {pattern}...", assemblyTag, method, handler.Pattern);
+            _logger.LogInformation(LogsDictionary.PluginHandlersRegisterer.HandlerRegistrationStarted, assemblyTag, method, handler.Pattern);
 
             var builder = CreateHandlerBuilder(handler);
 
             new HandlerConfigurator(builder, handler, assemblyTag, _provider).Configure();
 
-            _logger.LogInformation("[{assemblyTag}] Обработчик {method} -> {pattern} зарегистрирован", assemblyTag, method, handler.Pattern);
+            _logger.LogInformation(LogsDictionary.PluginHandlersRegisterer.HandlerRegistrationEnded, assemblyTag, method, handler.Pattern);
         }
 
         private RouteHandlerBuilder CreateHandlerBuilder(IEndpointHandler handler)
@@ -58,7 +59,7 @@ namespace Sudzekai.WebOs.Hosting
                 [handler.HttpMethod.ToString().ToUpperInvariant()],
                 GetHandlerDelegate(handler));
 
-        private static Delegate GetHandlerDelegate(IEndpointHandler handler)
+        private Delegate GetHandlerDelegate(IEndpointHandler handler)
             => async (HttpContext ctx) =>
             {
                 var request = await HandlerRequest.FromHttpRequest(ctx.Request);
@@ -66,7 +67,25 @@ namespace Sudzekai.WebOs.Hosting
                 var result = await handler.HandleAsync(request);
 
                 ctx.Response.StatusCode = result.StatusCode;
+
+                if (result.StatusCode == (int)HttpStatusCode.NoContent)
+                    return;
+
                 ctx.Response.ContentType = result.ContentType.ToBusinessString() + "; charset=utf-8";
+
+
+                if (handler.FilteringInfo is not null && handler.FilteringInfo.IsEnabled)
+                {
+                    if (result.ContentType is ContentType.ApplicationJson)
+                    {
+                        await ReponseEnvelopeJsonWriter.WriteAsync(ctx, result);
+                        return;
+                    }
+
+                    _logger.LogWarning(LogsDictionary.PluginHandlersRegisterer.HandlerUnsupportedContentType, 
+                        handler.HttpMethod, handler.Pattern, result.ContentType.ToBusinessString());
+                }
+
                 await ctx.Response.WriteAsync(result.Data?.ToString() ?? "", Encoding.UTF8);
             };
     }

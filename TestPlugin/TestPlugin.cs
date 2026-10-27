@@ -26,6 +26,9 @@ namespace TestPlugin
 
             _builder.Services.AddScoped<GetHandler>();
             _builder.Services.AddScoped<QueriedHandler>();
+            _builder.Services.AddScoped<FilteredErrorHandler>();
+            _builder.Services.AddScoped<FilteredTestObjectHandler>();
+            _builder.Services.AddScoped<FilteredTestStringHandler>();
 
             return 0;
         }

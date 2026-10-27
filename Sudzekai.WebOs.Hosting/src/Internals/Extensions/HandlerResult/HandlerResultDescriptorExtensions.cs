@@ -13,14 +13,14 @@ namespace Sudzekai.WebOs.Hosting
                 var statusCode = (HttpStatusCode)descriptor.StatusCode;
 
                 if (!Enum.IsDefined(statusCode))
-                    throw new InvalidOperationException("дескриптор содержал невалидный http status code");
+                    throw new InvalidOperationException(LogsDictionary.HandlerResultDescriptorExtensions.InvalidStatusCode);
 
                 var result = HandlerResult.Create(statusCode);
 
                 var contentType = (ContentType)descriptor.ContentType;
 
                 if (!Enum.IsDefined(contentType))
-                    throw new InvalidOperationException($"Неизвестный тип данных дескриптора: {descriptor.ContentType}");
+                    throw new InvalidOperationException(string.Format(LogsDictionary.HandlerResultDescriptorExtensions.UnknownContentType, descriptor.ContentType.ToString()));
 
                 result.As(contentType);
 

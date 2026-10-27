@@ -29,24 +29,24 @@ namespace Sudzekai.WebOs.Hosting
         {
             var roles = AddAuthorization();
             if (roles.Length == 0)
-                _logger.LogDebug("[{assemblyTag}] (1/4) Авторизация не требуется. Пункт пропускается", _assemblyTag);
+                _logger.LogDebug(LogsDictionary.HandlerConfigurator.AuthorizationSkipped, _assemblyTag);
             else
-                _logger.LogDebug("[{assemblyTag}] (1/4) Добавлена авторизация. Роли: {roles}", _assemblyTag, string.Join(", ", roles));
+                _logger.LogDebug(LogsDictionary.HandlerConfigurator.AuthorizationAdded, _assemblyTag, string.Join(", ", roles));
 
             var policy = AddLimiting();
-            _logger.LogDebug("[{assemblyTag}] (2/4) Добавлена политика ограничения. Политика: {policy}", _assemblyTag, policy);
+            _logger.LogDebug(LogsDictionary.HandlerConfigurator.RateLimitingAdded, _assemblyTag, policy);
 
             var openApiInfo = AddOpenApi();
             if (openApiInfo.Count == 0)
-                _logger.LogDebug("[{assemblyTag}] (3/4) Конфигурация OpenApi не требуется. Пункт пропускается", _assemblyTag);
+                _logger.LogDebug(LogsDictionary.HandlerConfigurator.OpenApiSkipped, _assemblyTag);
             else
-                _logger.LogDebug("[{assemblyTag}] (3/4) Добавлена конфигурация OpenApi. Параметры: {openApiInfo}", _assemblyTag, string.Join(", ", openApiInfo.Select(kv => $"{kv.Key}: {kv.Value}")));
+                _logger.LogDebug(LogsDictionary.HandlerConfigurator.OpenApiAdded, _assemblyTag, string.Join(", ", openApiInfo.Select(kv => $"{kv.Key}: {kv.Value}")));
 
             var routingInfo = AddRouting();
             if (routingInfo.Count == 0)
-                _logger.LogDebug("[{assemblyTag}] (4/4) Конфигурация роутинга не требуется. Пункт пропускается", _assemblyTag);
+                _logger.LogDebug(LogsDictionary.HandlerConfigurator.RoutingSkipped, _assemblyTag);
             else
-                _logger.LogDebug("[{assemblyTag}] (4/4) Добавлена конфигурация роутинга. Параметры: {routingInfo}", _assemblyTag, string.Join(", ", routingInfo.Select(kv => $"{kv.Key}: {kv.Value}")));
+                _logger.LogDebug(LogsDictionary.HandlerConfigurator.RoutingAdded, _assemblyTag, string.Join(", ", routingInfo.Select(kv => $"{kv.Key}: {kv.Value}")));
         }
 
         private string[] AddAuthorization()

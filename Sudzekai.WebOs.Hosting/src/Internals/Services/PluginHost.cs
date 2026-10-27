@@ -18,12 +18,14 @@ namespace Sudzekai.WebOs.Hosting
 
         public async Task LoadPluginsAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Поиск плагинов...");
+            _logger.LogInformation(LogsDictionary.PluginHost.PluginsSearchStarted);
 
             var plugins = await LoadPlugins();
 
             foreach (var plugin in plugins)
                 _registry.AddPlugin(plugin);
+
+            _logger.LogInformation(LogsDictionary.PluginHost.PluginsLoaded, _registry.GetPluginsList().Count);
         }
 
         private async Task<List<Plugin>> LoadPlugins()
@@ -32,7 +34,7 @@ namespace Sudzekai.WebOs.Hosting
 
             if (!Directory.Exists(pluginsDirPath))
             {
-                _logger.LogDebug("Создана директория plugins");
+                _logger.LogDebug(LogsDictionary.PluginHost.PluginsDirCreated);
                 Directory.CreateDirectory(pluginsDirPath);
                 return [];
             }
@@ -51,12 +53,12 @@ namespace Sudzekai.WebOs.Hosting
 
                 var jsonFiles = Directory.GetFiles(pluginDirPath).Where(f => f.EndsWith(".json"));
 
-                _logger.LogDebug("[{pluginDirTag}] JSON файлы директории: {files}", pluginDirTag, string.Join(", ", jsonFiles.Select(Path.GetFileName)));
+                _logger.LogDebug(LogsDictionary.PluginHost.DirJsonFiles, pluginDirTag, string.Join(", ", jsonFiles.Select(Path.GetFileName)));
 
                 var manifestFile = jsonFiles.FirstOrDefault(f => Path.GetFileName(f) == "manifest.json");
 
-                _logger.LogDebug("[{pluginDirTag}] Найден манифест: {manifestFileName}", pluginDirTag, Path.GetFileName(manifestFile));
-                _logger.LogInformation("[{pluginDirTag}] Директория сборок плагинов инициализирована", pluginDirTag);
+                _logger.LogDebug(LogsDictionary.PluginHost.ManifestFound, pluginDirTag, Path.GetFileName(manifestFile));
+                _logger.LogInformation(LogsDictionary.PluginHost.PluginDirInitialized, pluginDirTag);
 
                 if (manifestFile == null)
                     continue;
@@ -67,11 +69,11 @@ namespace Sudzekai.WebOs.Hosting
 
                 if (manifest is null)
                 {
-                    _logger.LogWarning("manifest.json директории {pluginDirTag} содержит невалидный json. Загрузка плагинов из неё пропускается...", pluginDirPath);
+                    _logger.LogWarning(LogsDictionary.PluginHost.ManifestIsInvalid, pluginDirPath);
                     continue;
                 }
 
-                _logger.LogDebug("[{pluginDirTag}] Манифест загружен. Сборки манифеста: {assemblies}", pluginDirTag, string.Join(", ", manifest.Assemblies));
+                _logger.LogDebug(LogsDictionary.PluginHost.ManifestLoaded, pluginDirTag, string.Join(", ", manifest.Assemblies));
 
                 var count = 0;
                 foreach (var assembly in manifest.Assemblies)
@@ -84,7 +86,7 @@ namespace Sudzekai.WebOs.Hosting
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogWarning("[{pluginDirTag}|{assemblyFileName}] {ex}. Загрузка плагина пропускается", pluginDirTag, Path.GetFileName(assembly), ex.Message);
+                        _logger.LogWarning(LogsDictionary.PluginHost.AssemblyException, pluginDirTag, Path.GetFileName(assembly), ex.Message);
                         continue;
                     }
 
@@ -92,7 +94,7 @@ namespace Sudzekai.WebOs.Hosting
                     count++;
                 }
 
-                _logger.LogInformation("[{pluginDirTag}] Загружено {count} сборок", pluginDirTag, count);
+                _logger.LogInformation(LogsDictionary.PluginHost.AssembliesLoaded, pluginDirTag, count);
             }
 
             return result;
