@@ -13,7 +13,7 @@
 
     <Authors>Sudzekai</Authors>
     <Company>Sudzekai</Company>
-    <Version>1.2.3</Version>
+    <Version>1.2.4</Version>
 
     <PackageId>Sudzekai.WebOs.Hosting</PackageId>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
@@ -23,6 +23,8 @@
 
     <Description>Sudzekai WebOS plugin host infrastructure for ASP.NET Core applications.</Description>
     <PackageTags>webos;plugin;sudzekai;hosting</PackageTags>
+
+	<PublishAot>true</PublishAot>
   </PropertyGroup>
 
   <ItemGroup>

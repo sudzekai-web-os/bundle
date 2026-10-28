@@ -13,7 +13,7 @@
 
     <Authors>Sudzekai</Authors>
     <Company>Sudzekai</Company>
-    <Version>1.2.2</Version>
+    <Version>1.2.3</Version>
 
     <PackageId>Sudzekai.WebOs.Core</PackageId>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
@@ -23,6 +23,8 @@
 
     <Description>Sudzekai WebOS plugin core types, descriptors, and utilities.</Description>
     <PackageTags>webos;plugin;sudzekai;core</PackageTags>
+
+	  <PublishAot>true</PublishAot>
   </PropertyGroup>
 
 </Project>

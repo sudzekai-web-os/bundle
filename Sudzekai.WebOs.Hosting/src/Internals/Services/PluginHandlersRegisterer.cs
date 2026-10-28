@@ -53,13 +53,13 @@ namespace Sudzekai.WebOs.Hosting
             _logger.LogInformation(LogsDictionary.PluginHandlersRegisterer.HandlerRegistrationEnded, assemblyTag, method, handler.Pattern);
         }
 
-        private RouteHandlerBuilder CreateHandlerBuilder(IEndpointHandler handler)
+        private IEndpointConventionBuilder CreateHandlerBuilder(IEndpointHandler handler)
             => _app.MapMethods(
                 handler.Pattern,
                 [handler.HttpMethod.ToString().ToUpperInvariant()],
                 GetHandlerDelegate(handler));
 
-        private Delegate GetHandlerDelegate(IEndpointHandler handler)
+        private RequestDelegate GetHandlerDelegate(IEndpointHandler handler)
             => async (HttpContext ctx) =>
             {
                 var request = await HandlerRequest.FromHttpRequest(ctx.Request);

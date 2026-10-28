@@ -13,7 +13,7 @@
 
     <Authors>Sudzekai</Authors>
     <Company>Sudzekai</Company>
-    <Version>1.2.2</Version>
+    <Version>1.2.3</Version>
 
     <PackageId>Sudzekai.WebOs.Plugin</PackageId>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
@@ -23,6 +23,8 @@
 
     <Description>Sudzekai WebOS plugin builder and SDK for creating native plugins.</Description>
     <PackageTags>webos;plugin;sudzekai;sdk</PackageTags>
+	
+    <PublishAot>true</PublishAot>
   </PropertyGroup>
 
   <ItemGroup>

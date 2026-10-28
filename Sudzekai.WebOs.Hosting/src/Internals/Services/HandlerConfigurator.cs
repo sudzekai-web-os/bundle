@@ -10,11 +10,11 @@ namespace Sudzekai.WebOs.Hosting
     {
         private readonly ILogger<HandlerConfigurator> _logger;
         private readonly IEndpointHandler _handler;
-        private readonly RouteHandlerBuilder _builder;
+        private readonly IEndpointConventionBuilder _builder;
         private readonly string _assemblyTag;
 
         public HandlerConfigurator(
-            RouteHandlerBuilder builder,
+            IEndpointConventionBuilder builder,
             IEndpointHandler handler,
             string assemblyTag,
             IServiceProvider sp)
