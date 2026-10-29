@@ -24,7 +24,7 @@ namespace bundle.Test.Hosting
 
             try
             {
-                var info = AssemblyInfo.FromDescriptor(descriptor);
+                var info = AssemblyInfo.FromDescriptor(ref descriptor);
 
                 Assert.Equal("Sudzekai.Weather", info.Name);
                 Assert.Equal("2.4.1", info.Version);
@@ -41,7 +41,7 @@ namespace bundle.Test.Hosting
         {
             var descriptor = new AssemblyInfoDescriptor();
 
-            var info = AssemblyInfo.FromDescriptor(descriptor);
+            var info = AssemblyInfo.FromDescriptor(ref descriptor);
 
             Assert.Equal(string.Empty, info.Name);
             Assert.Equal(string.Empty, info.Version);
