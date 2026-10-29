@@ -4,5 +4,5 @@ namespace Sudzekai.WebOs.Hosting
 {
     [JsonSourceGenerationOptions(PropertyNameCaseInsensitive = true)]
     [JsonSerializable(typeof(PluginManifest))]
-    internal partial class HostJsonContext : JsonSerializerContext;
+    internal partial class HostingJsonContext : JsonSerializerContext;
 }

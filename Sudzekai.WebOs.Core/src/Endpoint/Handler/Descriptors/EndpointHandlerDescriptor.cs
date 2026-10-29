@@ -29,20 +29,6 @@ namespace Sudzekai.WebOs.Core
         public int RateLimitingPolicy;
 
 
-        // OpenApi
-        public int IsOpenApiHandler;
-
-        public nint Name; public int NameLength;
-
-        public nint DisplayName; public int DisplayNameLength;
-
-        public nint* Tags; public int TagsCount;
-
-        public nint Summary; public int SummaryLength;
-
-        public nint GroupName; public int GroupNameLength;
-
-
         // Routed
         public int IsRoutedHandler;
 
@@ -54,12 +40,7 @@ namespace Sudzekai.WebOs.Core
         public void Dispose()
         {
             AllocationUtilities.FreeIfAllocated(ref Pattern);
-            AllocationUtilities.FreeIfAllocated(ref Name);
-            AllocationUtilities.FreeIfAllocated(ref DisplayName);
-            AllocationUtilities.FreeIfAllocated(ref Summary);
-            AllocationUtilities.FreeIfAllocated(ref GroupName);
             AllocationUtilities.FreeStringArray(Hosts, HostsCount);
-            AllocationUtilities.FreeStringArray(Tags, TagsCount);
         }
     }
 }

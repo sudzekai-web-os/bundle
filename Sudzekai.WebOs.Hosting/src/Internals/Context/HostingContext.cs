@@ -1,4 +1,5 @@
-﻿namespace Sudzekai.WebOs.Hosting.src.Internals.Context
+﻿
+namespace Sudzekai.WebOs.Hosting
 {
     public static class HostingContext
     {

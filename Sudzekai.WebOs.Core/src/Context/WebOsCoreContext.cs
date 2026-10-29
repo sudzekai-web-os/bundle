@@ -8,6 +8,7 @@
             public const string Build = "build";
             public const string DelegateLogging = "delegate_logging";
             public const string GetHandlers = "get_handlers";
+            public const string GetHandlersMetadata = "get_handlers_metadata";
             public const string GetInfo = "get_info";
             public const string Dispose = "dispose";
         }

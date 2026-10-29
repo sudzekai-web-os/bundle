@@ -8,7 +8,7 @@ namespace Sudzekai.WebOs.Hosting
     {
         extension(HandlerResult)
         {
-            public static HandlerResult FromDescriptor(HandlerResultDescriptor descriptor)
+            public static HandlerResult FromDescriptor(ref HandlerResultDescriptor descriptor)
             {
                 var statusCode = (HttpStatusCode)descriptor.StatusCode;
 
@@ -26,7 +26,7 @@ namespace Sudzekai.WebOs.Hosting
 
                 result.WithData(AllocationUtilities.ToString(descriptor.Data, descriptor.DataLength));
 
-                Marshal.FreeCoTaskMem(descriptor.Data);
+                descriptor.Dispose();
 
                 return result;
             }

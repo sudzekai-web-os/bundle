@@ -15,10 +15,10 @@ namespace Sudzekai.WebOs.Hosting
                 await host.LoadPluginsAsync(default);
             }
 
-            public void AddHandlers()
+            public void MapHandlers()
             {
-                var registry = app.Services.GetRequiredService<PluginsRegistry>();
-                var registerer = new PluginHandlersRegisterer(app);
+                var registry = app.Services.GetRequiredService<AssembliesRegistry>();
+                var registerer = new AssemblyHandlersRegisterer(app);
 
                 var plugins = registry.GetPluginsList();
 
@@ -33,9 +33,9 @@ namespace Sudzekai.WebOs.Hosting
                     registerer.RegisterHandler(handler, "Internal");
             }
 
-            public IReadOnlyList<Plugin> GetPluginsList()
+            public IReadOnlyList<PluginAssembly> GetPluginsList()
             {
-                var registry = app.Services.GetRequiredService<PluginsRegistry>();
+                var registry = app.Services.GetRequiredService<AssembliesRegistry>();
 
                 return registry.GetPluginsList();
             }

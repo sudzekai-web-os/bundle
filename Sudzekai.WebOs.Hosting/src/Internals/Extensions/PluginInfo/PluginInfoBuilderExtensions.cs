@@ -4,16 +4,20 @@ namespace Sudzekai.WebOs.Hosting
 {
     internal static class PluginInfoBuilderExtensions
     {
-        extension (PluginInfo)
+        extension (AssemblyInfo)
         {
-            public static PluginInfo FromDescriptor(PluginInfoDescriptor descriptor)
+            public static AssemblyInfo FromDescriptor(ref AssemblyInfoDescriptor descriptor)
             {
-                return new()
+                AssemblyInfo info = new()
                 {
                     Name = AllocationUtilities.ToString(descriptor.Name, descriptor.NameLength),
                     Version = AllocationUtilities.ToString(descriptor.Version, descriptor.VersionLength),
                     Summary = AllocationUtilities.ToString(descriptor.Summary, descriptor.SummaryLength)
                 };
+
+                descriptor.Dispose();
+
+                return info;
             }
         }
     }

@@ -5,11 +5,11 @@ namespace Sudzekai.WebOs.Hosting
 {
     internal class PluginHost
     {
-        private readonly PluginLoader _loader;
-        private readonly PluginsRegistry _registry;
+        private readonly AssemblyLoader _loader;
+        private readonly AssembliesRegistry _registry;
         private readonly ILogger<PluginHost> _logger;
 
-        public PluginHost(PluginLoader loader, PluginsRegistry registry, ILogger<PluginHost> logger)
+        public PluginHost(AssemblyLoader loader, AssembliesRegistry registry, ILogger<PluginHost> logger)
         {
             _loader = loader;
             _registry = registry;
@@ -20,15 +20,12 @@ namespace Sudzekai.WebOs.Hosting
         {
             _logger.LogInformation(LogsDictionary.PluginHost.PluginsSearchStarted);
 
-            var plugins = await LoadPlugins();
-
-            foreach (var plugin in plugins)
-                _registry.AddPlugin(plugin);
+            await LoadPluginsAsync();
 
             _logger.LogInformation(LogsDictionary.PluginHost.PluginsLoaded, _registry.GetPluginsList().Count);
         }
 
-        private async Task<List<Plugin>> LoadPlugins()
+        private async Task LoadPluginsAsync()
         {
             var pluginsDirPath = Path.Combine(AppContext.BaseDirectory, "plugins");
 
@@ -36,68 +33,73 @@ namespace Sudzekai.WebOs.Hosting
             {
                 _logger.LogDebug(LogsDictionary.PluginHost.PluginsDirCreated);
                 Directory.CreateDirectory(pluginsDirPath);
-                return [];
+                return;
             }
 
-            var dirPaths = Directory.GetDirectories(pluginsDirPath);
+            var pluginDirs = Directory.GetDirectories(pluginsDirPath);
 
-            if (dirPaths.Length == 0)
-                return [];
+            if (pluginDirs.Length == 0)
+                return;
 
-            List<Plugin> result = [];
-
-            foreach (var dirPath in dirPaths)
-            {
-                var pluginDirPath = Path.Combine(pluginsDirPath, dirPath);
-                var pluginDirTag = Path.GetFileName(pluginDirPath);
-
-                var jsonFiles = Directory.GetFiles(pluginDirPath).Where(f => f.EndsWith(".json"));
-
-                _logger.LogDebug(LogsDictionary.PluginHost.DirJsonFiles, pluginDirTag, string.Join(", ", jsonFiles.Select(Path.GetFileName)));
-
-                var manifestFile = jsonFiles.FirstOrDefault(f => Path.GetFileName(f) == "manifest.json");
-
-                _logger.LogDebug(LogsDictionary.PluginHost.ManifestFound, pluginDirTag, Path.GetFileName(manifestFile));
-                _logger.LogInformation(LogsDictionary.PluginHost.PluginDirInitialized, pluginDirTag);
-
-                if (manifestFile == null)
-                    continue;
-
-                var manifestJson = await File.ReadAllTextAsync(manifestFile);
-
-                var manifest = JsonSerializer.Deserialize(manifestJson, HostJsonContext.Default.PluginManifest);
-
-                if (manifest is null)
-                {
-                    _logger.LogWarning(LogsDictionary.PluginHost.ManifestIsInvalid, pluginDirPath);
-                    continue;
-                }
-
-                _logger.LogDebug(LogsDictionary.PluginHost.ManifestLoaded, pluginDirTag, string.Join(", ", manifest.Assemblies));
-
-                var count = 0;
-                foreach (var assembly in manifest.Assemblies)
-                {
-                    Plugin plugin;
-
-                    try
-                    {
-                        plugin = _loader.Load(Path.Combine(pluginDirPath, assembly));
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogWarning(LogsDictionary.PluginHost.AssemblyException, pluginDirTag, Path.GetFileName(assembly), ex.Message);
-                        continue;
-                    }
-
-                    result.Add(plugin);
-                    count++;
-                }
-
-                _logger.LogInformation(LogsDictionary.PluginHost.AssembliesLoaded, pluginDirTag, count);
-            }
-
-            return result;
+            foreach (var dirPath in pluginDirs)
+                await LoadAssemblies(pluginsDirPath, dirPath);
         }
+
+        private async Task LoadAssemblies(string pluginsDirPath, string dirPath)
+        {
+            var assembliesDirPath = Path.Combine(pluginsDirPath, dirPath);
+            var assembliesDirTag = Path.GetFileName(assembliesDirPath);
+
+            var manifest = await GetPluginManifestAsync(assembliesDirPath);
+
+            if (manifest is null)
+            {
+                _logger.LogWarning(LogsDictionary.PluginHost.ManifestIsInvalid, assembliesDirPath);
+                return;
+            }
+
+            _logger.LogDebug(LogsDictionary.PluginHost.ManifestLoaded, assembliesDirTag, string.Join(", ", manifest.Assemblies));
+
+            var count = 0;
+
+            foreach (var assembly in manifest.Assemblies)
+            {
+                _logger.LogInformation(LogsDictionary.PluginHost.AssembliesLoadingStarted, assembliesDirTag);
+
+				try
+                {
+                    LoadAssembly(Path.Combine(assembliesDirPath, assembly));
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(LogsDictionary.PluginHost.AssemblyException, assembliesDirTag, Path.GetFileName(assembly), ex.Message);
+                }
+
+                count++;
+            }
+
+            _logger.LogInformation(LogsDictionary.PluginHost.AssembliesLoaded, assembliesDirTag, count);
+            return;
+        }
+
+        private void LoadAssembly(string assemblyPath)
+        {
+			var plugin = _loader.Load(assemblyPath);
+			_registry.AddPlugin(plugin);
+		}
+
+        private static async Task<PluginManifest?> GetPluginManifestAsync(string directoryPath)
+        {
+			var jsonFiles = Directory.GetFiles(directoryPath).Where(f => f.EndsWith(".json"));
+
+            var manifestFilePath = jsonFiles.FirstOrDefault(f => Path.GetFileName(f) == "manifest.json");
+            
+            if (string.IsNullOrWhiteSpace(manifestFilePath)) 
+                return null;
+
+            var json = await File.ReadAllTextAsync(manifestFilePath);
+
+            return JsonSerializer.Deserialize(json, HostingJsonContext.Default.PluginManifest);
+		}
     }
 }

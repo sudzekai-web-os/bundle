@@ -13,7 +13,6 @@ namespace Sudzekai.WebOs.Hosting
                 handler.WithAuthorization(GetAuthorizationInfo(ref descriptor));
                 handler.WithFilter(GetFilterInfo(ref descriptor));
                 handler.WithLimiting(GetLimitingInfo(ref descriptor));
-                handler.WithOpenApi(GetOpenApiInfo(ref descriptor));
                 handler.WithRouting(GetRoutingInfo(ref descriptor));
 
                 descriptor.Dispose();
@@ -32,7 +31,7 @@ namespace Sudzekai.WebOs.Hosting
             {
                 var describedResult = handleDelegate(req.ToDescriptor());
 
-                return HandlerResult.FromDescriptor(describedResult);
+                return HandlerResult.FromDescriptor(ref describedResult);
             };
 
             return new EndpointHandler(pattern, method, handleFunc);
@@ -71,20 +70,6 @@ namespace Sudzekai.WebOs.Hosting
                 throw new InvalidOperationException(LogsDictionary.EndpointHandlerBuilderExtensions.InvalidLimitingPolicy);
 
             return new(rateLimitingPolicy);
-        }
-
-        private static unsafe HandlerOpenApiInfo? GetOpenApiInfo(ref EndpointHandlerDescriptor descriptor)
-        {
-            if (descriptor.IsOpenApiHandler == 0)
-                return null;
-
-            var name = AllocationUtilities.ToString(descriptor.Name, descriptor.NameLength);
-            var displayName = AllocationUtilities.ToString(descriptor.DisplayName, descriptor.DisplayNameLength);
-            var tags = AllocationUtilities.ToStringArray(descriptor.Tags, descriptor.TagsCount);
-            var summary = AllocationUtilities.ToString(descriptor.Summary, descriptor.SummaryLength);
-            var groupName = AllocationUtilities.ToString(descriptor.GroupName, descriptor.GroupNameLength);
-
-            return new(name, displayName, tags, summary, groupName);
         }
 
         private static unsafe HandlerRoutingInfo? GetRoutingInfo(ref EndpointHandlerDescriptor descriptor)

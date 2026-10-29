@@ -20,5 +20,17 @@ namespace TestPlugin.Handlers
         }
 
         public HandlerFilteringInfo FilteringInfo { get; } = new(true);
+
+        public HandlerOpenApiInfo? OpenApiInfo { get; } = new(
+            "getTestObject",
+            "Get test object",
+            ["object"],
+            "Возвращает тестовый объект")
+        {
+            Responses =
+            [
+                new(200, PluginJsonContext.Default.TestObject)
+            ]
+        };
     }
 }

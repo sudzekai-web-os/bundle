@@ -16,6 +16,8 @@ namespace TestPluginHost
 
             builder.Services.ConfigureRateLimiting();
 
+            builder.Services.AddOpenApi();
+
             builder.Services.AddAuthentication();
             builder.Services.AddAuthorization();
             
@@ -38,7 +40,8 @@ namespace TestPluginHost
 
             await app.LoadPluginsAsync();
 
-            app.AddHandlers();
+            app.MapHandlers();
+            app.MapOpenApi();
 
             var logger = app.Services.GetRequiredService<ILogger<Program>>();
 
@@ -47,7 +50,7 @@ namespace TestPluginHost
                 $"   {i+1}: {Path.GetFileName(Path.GetDirectoryName(p.AssemblyPath))}/{Path.GetFileName(p.AssemblyPath)} " +
                 $"| {p.Info.Name} " +
                 $"| ver. {p.Info.Version} " +
-                $"| обработчиков: {p.Handlers.Length} " +
+                $"| обработчиков: {p.Handlers.Count} " +
                 $"| {p.Info.Summary}")));
 
             await app.StartAsync();

@@ -12,7 +12,7 @@ namespace bundle.Test.Hosting
             var version = AllocationUtilities.AllocString("2.4.1", out var versionLength);
             var summary = AllocationUtilities.AllocString("Weather forecast plugin", out var summaryLength);
 
-            var descriptor = new PluginInfoDescriptor
+            var descriptor = new AssemblyInfoDescriptor
             {
                 Name = name,
                 NameLength = nameLength,
@@ -24,7 +24,7 @@ namespace bundle.Test.Hosting
 
             try
             {
-                var info = PluginInfo.FromDescriptor(descriptor);
+                var info = AssemblyInfo.FromDescriptor(descriptor);
 
                 Assert.Equal("Sudzekai.Weather", info.Name);
                 Assert.Equal("2.4.1", info.Version);
@@ -39,9 +39,9 @@ namespace bundle.Test.Hosting
         [Fact]
         public void FromDescriptor_MapsEmptyValues()
         {
-            var descriptor = new PluginInfoDescriptor();
+            var descriptor = new AssemblyInfoDescriptor();
 
-            var info = PluginInfo.FromDescriptor(descriptor);
+            var info = AssemblyInfo.FromDescriptor(descriptor);
 
             Assert.Equal(string.Empty, info.Name);
             Assert.Equal(string.Empty, info.Version);

@@ -29,23 +29,6 @@ namespace bundle.Test.Plugin
                 Assert.Equal(1, descriptor.IsLimitedHandler);
                 Assert.Equal((int)RateLimitingPolicy.Strict, descriptor.RateLimitingPolicy);
 
-                Assert.Equal(1, descriptor.IsOpenApiHandler);
-                Assert.Equal(
-                    "GetItem",
-                    AllocationUtilities.ToString(descriptor.Name, descriptor.NameLength));
-                Assert.Equal(
-                    "Get item",
-                    AllocationUtilities.ToString(descriptor.DisplayName, descriptor.DisplayNameLength));
-                Assert.Equal(
-                    new[] { "items", "read" },
-                    AllocationUtilities.ToStringArray(descriptor.Tags, descriptor.TagsCount));
-                Assert.Equal(
-                    "Returns an item",
-                    AllocationUtilities.ToString(descriptor.Summary, descriptor.SummaryLength));
-                Assert.Equal(
-                    "Items",
-                    AllocationUtilities.ToString(descriptor.GroupName, descriptor.GroupNameLength));
-
                 Assert.Equal(1, descriptor.IsRoutedHandler);
                 Assert.Equal(7, descriptor.Priority);
                 Assert.Equal(
@@ -75,7 +58,6 @@ namespace bundle.Test.Plugin
                 Assert.Equal(0, descriptor.RequiredRoles);
                 Assert.Equal(0, descriptor.IsFilteredHandler);
                 Assert.Equal(0, descriptor.IsLimitedHandler);
-                Assert.Equal(0, descriptor.IsOpenApiHandler);
                 Assert.Equal(0, descriptor.IsRoutedHandler);
             }
             finally
@@ -135,7 +117,7 @@ namespace bundle.Test.Plugin
             public HandlerLimitingInfo? LimitingInfo => new(RateLimitingPolicy.Strict);
 
             public HandlerOpenApiInfo? OpenApiInfo =>
-                new("GetItem", "Get item", ["items", "read"], "Returns an item", "Items");
+                new("GetItem", "Get item", ["items", "read"], "Returns an item");
 
             public HandlerRoutingInfo? RoutingInfo =>
                 new(7, ["api.example.org", "www.example.org"]);

@@ -15,6 +15,19 @@ namespace TestPlugin.Handlers
             return Task.FromResult(HandlerResult.BadRequest().WithData("string").AsJson(PluginJsonContext.Default.String));
         }
 
-        public HandlerFilteringInfo FilteringInfo { get; } = new(true);
+        public HandlerFilteringInfo? FilteringInfo { get; } = new(true);
+
+        public HandlerOpenApiInfo? OpenApiInfo { get; } = new(
+            "operationId",
+            "displayName",
+            ["tag"],
+            "summary")
+        {
+            Description = "Тестовый обработчик с ошибкой",
+            Responses =
+            [
+                new(400, PluginJsonContext.Default.String, "Ошибка")
+            ]
+        };
     }
 }

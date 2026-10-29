@@ -17,7 +17,7 @@ namespace bundle.Test.Hosting
                 dataLength,
                 (int)ContentType.TextHtml);
 
-            var result = HandlerResult.FromDescriptor(descriptor);
+            var result = HandlerResult.FromDescriptor(ref descriptor);
 
             Assert.Equal((int)HttpStatusCode.Accepted, result.StatusCode);
             Assert.Equal(ContentType.TextHtml, result.ContentType);
@@ -33,7 +33,7 @@ namespace bundle.Test.Hosting
                 0,
                 (int)ContentType.TextPlain);
 
-            var result = HandlerResult.FromDescriptor(descriptor);
+            var result = HandlerResult.FromDescriptor(ref descriptor);
 
             Assert.Equal((int)HttpStatusCode.NoContent, result.StatusCode);
             Assert.Equal(ContentType.TextPlain, result.ContentType);

@@ -54,8 +54,13 @@ namespace TestPlugin
             => _plugin.GetHandlers(count);
 
 
+        [UnmanagedCallersOnly(EntryPoint = WebOsCoreContext.Exports.GetHandlersMetadata)]
+        public static unsafe nint GetHandlersMetadata(int* length)
+            => _plugin.GetHandlersMetadata(length);
+
+
         [UnmanagedCallersOnly(EntryPoint = WebOsCoreContext.Exports.GetInfo)]
-        public static PluginInfoDescriptor GetPluginInfo()
+        public static AssemblyInfoDescriptor GetPluginInfo()
             => _plugin.GetPluginInfo();
 
 

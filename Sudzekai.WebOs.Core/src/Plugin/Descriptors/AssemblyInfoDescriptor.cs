@@ -3,7 +3,7 @@
 namespace Sudzekai.WebOs.Core
 {
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct PluginInfoDescriptor : IDisposable
+    public struct AssemblyInfoDescriptor : IDisposable
     {
         public nint Name; public int NameLength;
 

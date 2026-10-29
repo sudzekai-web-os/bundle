@@ -17,6 +17,18 @@ namespace TestPlugin.Handlers
 
         public HandlerHttpMethod HttpMethod => HandlerHttpMethod.Get;
 
+        public HandlerOpenApiInfo? OpenApiInfo { get; } = new(
+            "getQueryById",
+            "Get query by id",
+            ["query"],
+            "Возвращает значение маршрутного параметра")
+        {
+            Responses =
+            [
+                new(200, JsonContext.Default.String)
+            ]
+        };
+
         public Task<HandlerResult> HandleAsync(HandlerRequest request)
         {
             _logger.LogInformation(request.ToString());

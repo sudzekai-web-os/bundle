@@ -129,18 +129,6 @@ namespace bundle.Test.Hosting
                 IsLimitedHandler = 1,
                 RateLimitingPolicy = (int)RateLimitingPolicy.Strict,
 
-                IsOpenApiHandler = 1,
-                Name = name,
-                NameLength = nameLength,
-                DisplayName = displayName,
-                DisplayNameLength = displayNameLength,
-                Tags = tags,
-                TagsCount = tagsCount,
-                Summary = summary,
-                SummaryLength = summaryLength,
-                GroupName = groupName,
-                GroupNameLength = groupNameLength,
-
                 IsRoutedHandler = 1,
                 Priority = 7,
                 Hosts = hosts,

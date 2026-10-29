@@ -6,7 +6,7 @@ namespace Sudzekai.WebOs.Plugin
 {
     public class WebOsPluginBuilder
     {
-        private PluginInfo? _pluginInfo;
+        private AssemblyInfo? _pluginInfo;
 
         private WebOsPluginBuilder() { }
 
@@ -16,7 +16,7 @@ namespace Sudzekai.WebOs.Plugin
         public readonly ServiceCollection Services = new();
 
         
-        public void SetInformation(PluginInfo info)
+        public void SetInformation(AssemblyInfo info)
             => _pluginInfo = info;
 
         public WebOsPlugin Build()

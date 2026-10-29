@@ -8,20 +8,20 @@ using System.Text;
 
 namespace Sudzekai.WebOs.Hosting
 {
-    internal class PluginHandlersRegisterer
+    internal class AssemblyHandlersRegisterer
     {
-        private readonly ILogger<PluginHandlersRegisterer> _logger;
-        private readonly IServiceProvider _provider;
-        private WebApplication _app;
+        private readonly ILogger<AssemblyHandlersRegisterer> _logger;
+        private readonly WebApplication _app;
+        private readonly HandlerConfigurator _configurator;
 
-        public PluginHandlersRegisterer(WebApplication app)
+        public AssemblyHandlersRegisterer(WebApplication app)
         {
             _app = app;
-            _provider = app.Services;
-            _logger = _provider.GetRequiredService<ILogger<PluginHandlersRegisterer>>();
+            _logger = app.Services.GetRequiredService<ILogger<AssemblyHandlersRegisterer>>();
+            _configurator = app.Services.GetRequiredService<HandlerConfigurator>();
         }
 
-        public void RegisterHandlers(Plugin plugin)
+        public void RegisterHandlers(PluginAssembly plugin)
         {
             _logger.LogInformation(LogsDictionary.PluginHandlersRegisterer.PluginHandlersRegistrationStarted, plugin.Info.Name);
 
@@ -29,11 +29,9 @@ namespace Sudzekai.WebOs.Hosting
 
             var assemblyTag = $"{Path.GetFileName(Path.GetDirectoryName(plugin.AssemblyPath))}|{Path.GetFileName(plugin.AssemblyPath)}";
 
-            foreach (var handler in plugin.Handlers)
+            foreach (var handler in plugin.EndpointHandlers)
             {
-
                 RegisterHandler(handler, assemblyTag);
-
                 count++;
             }
 
@@ -48,7 +46,7 @@ namespace Sudzekai.WebOs.Hosting
 
             var builder = CreateHandlerBuilder(handler);
 
-            new HandlerConfigurator(builder, handler, assemblyTag, _provider).Configure();
+            _configurator.Configure(builder, handler, assemblyTag);
 
             _logger.LogInformation(LogsDictionary.PluginHandlersRegisterer.HandlerRegistrationEnded, assemblyTag, method, handler.Pattern);
         }
@@ -82,7 +80,7 @@ namespace Sudzekai.WebOs.Hosting
                         return;
                     }
 
-                    _logger.LogWarning(LogsDictionary.PluginHandlersRegisterer.HandlerUnsupportedContentType, 
+                    _logger.LogWarning(LogsDictionary.PluginHandlersRegisterer.HandlerUnsupportedContentType,
                         handler.HttpMethod, handler.Pattern, result.ContentType.ToBusinessString());
                 }
 

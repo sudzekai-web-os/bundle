@@ -8,7 +8,7 @@ namespace bundle.Test.Plugin
         [Fact]
         public void ToDescriptor_MapsNameVersionAndSummary()
         {
-            var info = new PluginInfo
+            var info = new AssemblyInfo
             {
                 Name = "Sudzekai.Weather",
                 Version = "2.4.1",
@@ -38,7 +38,7 @@ namespace bundle.Test.Plugin
         [Fact]
         public void ToDescriptor_MapsDefaultPluginInfo()
         {
-            var descriptor = new PluginInfo().ToDescriptor();
+            var descriptor = new AssemblyInfo().ToDescriptor();
 
             try
             {

@@ -1,8 +1,8 @@
 ﻿namespace Sudzekai.WebOs.Core
 {
-    public class PluginInfo
+    public class AssemblyInfo
     {
-        public string Name { get; set; } = "неизвестный плагин";
+        public string Name { get; set; } = "неизвестная сборка";
         
         public string Version { get; set; } = "0.0.0";
 

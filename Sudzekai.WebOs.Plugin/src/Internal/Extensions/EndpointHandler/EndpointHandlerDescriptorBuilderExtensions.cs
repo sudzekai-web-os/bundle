@@ -31,33 +31,9 @@ namespace Sudzekai.WebOs.Plugin
 
             ConfigureLimitedHandler(ref result, handler.LimitingInfo);
 
-            ConfigureOpenApiHandler(ref result, handler.OpenApiInfo);
-
             ConfigureRoutedHandler(ref result, handler.RoutingInfo);
 
             return result;
-        }
-
-        private static unsafe void ConfigureOpenApiHandler(ref EndpointHandlerDescriptor descriptor, HandlerOpenApiInfo? info)
-        {
-            if (info is null)
-                return;
-
-            descriptor.IsOpenApiHandler = 1;
-            descriptor.Name = AllocationUtilities.AllocString(info.Name, out var nameLength);
-            descriptor.NameLength = nameLength;
-
-            descriptor.DisplayName = AllocationUtilities.AllocString(info.DisplayName, out var displayNameLength);
-            descriptor.DisplayNameLength = displayNameLength;
-
-            descriptor.Tags = AllocationUtilities.AllocStringArray(info.Tags, out var count);
-            descriptor.TagsCount = count;
-
-            descriptor.Summary = AllocationUtilities.AllocString(info.Summary, out var summaryLength);
-            descriptor.SummaryLength = summaryLength;
-
-            descriptor.GroupName = AllocationUtilities.AllocString(info.GroupName, out var groupNameLength);
-            descriptor.GroupNameLength = groupNameLength;
         }
 
         private static void ConfigureLimitedHandler(ref EndpointHandlerDescriptor descriptor, HandlerLimitingInfo? info)
