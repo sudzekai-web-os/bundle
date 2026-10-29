@@ -21,10 +21,20 @@ namespace Sudzekai.WebOs.Plugin
 
         public WebOsPlugin Build()
         {
+            RegisterInternalServices();
+
             var provider = Services.BuildServiceProvider();
             Services.MakeReadOnly();
 
             return new(provider, GetRegisteredHandlerTypes(), _pluginInfo);
+        }
+
+        private void RegisterInternalServices()
+        {
+            Services.AddSingleton<IEndpointHandlerManager, EndpointHandlerManager>();
+            Services.AddSingleton<IOpenApiSchemaWriter, OpenApiSchemaWriter>();
+            Services.AddSingleton<IOpenApiOperationWriter, OpenApiOperationWriter>();
+            Services.AddSingleton<IOpenApiMetadataWriter, OpenApiMetadataWriter>();
         }
 
         public unsafe int DelegateLogging(nint logActionPtr)

@@ -1,18 +1,16 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Sudzekai.WebOs.Core;
 using System.Runtime.InteropServices;
-using System.Text.Json;
 
 namespace Sudzekai.WebOs.Plugin
 {
     public class WebOsPlugin
     {
+        private readonly IEndpointHandlerManager _handlerManager;
+
+        private readonly IOpenApiMetadataWriter _metadataWriter;
+
         private AssemblyInfo _pluginInfo;
-
-        private EndpointHandlerDescriptor[] _handlerDescriptors = [];
-
-        private readonly List<IEndpointHandler> _handlers = [];
 
         public readonly ServiceProvider Services;
 
@@ -24,13 +22,17 @@ namespace Sudzekai.WebOs.Plugin
             _pluginInfo = info ?? new();
 
             Services = services;
-            LoadHandlerDescriptors(handlerTypes);
+            _handlerManager = services.GetRequiredService<IEndpointHandlerManager>();
+            _metadataWriter = services.GetRequiredService<IOpenApiMetadataWriter>();
+            _handlerManager.Load(handlerTypes);
         }
 
         public unsafe EndpointHandlerDescriptor* GetHandlers(int* count)
         {
-            *count = _handlerDescriptors.Length;
-            if (_handlerDescriptors.Length == 0)
+            var descriptors = _handlerManager.Descriptors;
+
+            *count = descriptors.Length;
+            if (descriptors.Length == 0)
                 return null;
 
             int size = Marshal.SizeOf<EndpointHandlerDescriptor>();
@@ -38,7 +40,7 @@ namespace Sudzekai.WebOs.Plugin
             var mem = (EndpointHandlerDescriptor*)Marshal.AllocCoTaskMem(size * *count);
 
             for (int i = 0; i < *count; i++)
-                Marshal.StructureToPtr(_handlerDescriptors[i], (nint)(mem + i), fDeleteOld: false);
+                Marshal.StructureToPtr(descriptors[i], (nint)(mem + i), fDeleteOld: false);
 
             return mem;
         }
@@ -48,53 +50,14 @@ namespace Sudzekai.WebOs.Plugin
 
         public unsafe nint GetHandlersMetadata(int* length)
         {
-            var json = HandlerOpenApiMetadataWriter.Write(_handlers);
+            var json = _metadataWriter.Write(_handlerManager.Handlers);
 
             return AllocationUtilities.AllocString(json, out *length);
         }
 
-        private void LoadHandlerDescriptors(List<Type> handlerTypes)
-        {
-            foreach (var type in handlerTypes)
-            {
-                var temp = (IEndpointHandler)Services.GetRequiredService(type);
-
-                _handlers.Add(temp);
-
-                var descriptor = temp.ToDescriptor();
-
-                descriptor.SetHandler(DecorateHandleFunc(type));
-
-                _handlerDescriptors = [.. _handlerDescriptors.Append(descriptor)];
-            }
-        }
-
-        private Func<HandlerRequest, Task<HandlerResult>> DecorateHandleFunc(Type type)
-            => (request) =>
-            {
-                var logger = Services.GetRequiredService<ILoggerFactory>().CreateLogger(type.ToString());
-
-                var handler = (IEndpointHandler)Services.GetRequiredService(type)!;
-
-                var result = handler.HandleAsync(request).GetAwaiter().GetResult();
-
-                if (result.ContentType is ContentType.ApplicationJson)
-                {
-                    if (result.JsonTypeInfo is null)
-                        throw new InvalidOperationException($"у метода обработки обработчика типа {type} возвращаемый тип данных - application/json, но JsonTypeInfo не был указан");
-
-                    var resultData = JsonSerializer.Serialize(result.Data, result.JsonTypeInfo);
-
-                    result.WithData(resultData);
-                }
-
-                return Task.FromResult(result);
-            };
-
         public int Dispose()
         {
-            foreach (var handlerDescriptor in _handlerDescriptors)
-                handlerDescriptor.Release();
+            _handlerManager.Release();
 
             return 0;
         }
