@@ -65,3 +65,4 @@ jobs:
           Write-Host "Pushing packages:"
           $packages | ForEach-Object { Write-Host "  $_" }
           dotnet nuget push $packages --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}" --source "https://api.nuget.org/v3/index.json" --skip-duplicate
+
