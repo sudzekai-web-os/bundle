@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Sudzekai.WebOs.Core;
 using Sudzekai.WebOs.Plugin;
+using TestPlugin.Context;
 
 namespace TestPlugin.Handlers
 {
@@ -23,9 +24,11 @@ namespace TestPlugin.Handlers
             ["query"],
             "Возвращает значение маршрутного параметра")
         {
+            Description = "Читает маршрутный параметр id и возвращает его значение.",
             Responses =
             [
-                new(200, JsonContext.Default.String)
+                new(200, PluginJsonContext.Default.String, "Значение маршрутного параметра"),
+                new(400, PluginJsonContext.Default.String, "Некорректный идентификатор")
             ]
         };
 
@@ -33,7 +36,7 @@ namespace TestPlugin.Handlers
         {
             _logger.LogInformation(request.ToString());
 
-            return Task.FromResult(HandlerResult.Ok().WithData(request.RouteValues["id"]));
+            return Task.FromResult(HandlerResult.Ok().WithData(request.RouteValues["id"]).AsJson(PluginJsonContext.Default.String));
         }
     }
 }

@@ -27,6 +27,7 @@ namespace TestPlugin.Handlers
             ["object"],
             "Возвращает тестовый объект")
         {
+            Description = "Возвращает тестовый объект в обёртке ответа (filtered).",
             Responses =
             [
                 new(200, PluginJsonContext.Default.TestObject)

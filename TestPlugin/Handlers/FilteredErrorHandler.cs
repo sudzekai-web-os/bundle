@@ -18,12 +18,12 @@ namespace TestPlugin.Handlers
         public HandlerFilteringInfo? FilteringInfo { get; } = new(true);
 
         public HandlerOpenApiInfo? OpenApiInfo { get; } = new(
-            "operationId",
-            "displayName",
-            ["tag"],
-            "summary")
+            "getError",
+            "Get error",
+            ["error"],
+            "Возвращает ошибку")
         {
-            Description = "Тестовый обработчик с ошибкой",
+            Description = "Тестовый обработчик, возвращающий ошибку в обёртке ответа (filtered).",
             Responses =
             [
                 new(400, PluginJsonContext.Default.String, "Ошибка")

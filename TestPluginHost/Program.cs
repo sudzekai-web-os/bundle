@@ -1,5 +1,7 @@
+using Scalar.AspNetCore;
 using Sudzekai.WebOs.Core;
 using Sudzekai.WebOs.Hosting;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using TestPluginHost.ConsoleFormatting;
 using TestPluginHost.Handlers;
@@ -35,6 +37,8 @@ namespace TestPluginHost
 
             var app = builder.Build();
 
+            app.MapScalarApiReference();
+
             app.UseAuthentication();
             app.UseAuthorization();
 
@@ -55,7 +59,26 @@ namespace TestPluginHost
 
             await app.StartAsync();
 
+            OpenSwaggerUi(app);
+
             await app.WaitForShutdownAsync();
+        }
+
+        private static void OpenSwaggerUi(WebApplication app)
+        {
+            var address = app.Urls.FirstOrDefault(u => u.StartsWith("http://"))
+                          ?? app.Urls.FirstOrDefault()
+                          ?? "http://localhost:5000";
+
+            var url = address.TrimEnd('/') + "/scalar/v1";
+
+            try
+            {
+                Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+            }
+            catch (Exception)
+            {
+            }
         }
     }
 }

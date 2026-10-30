@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Sudzekai.WebOs.Core;
 using Sudzekai.WebOs.Plugin;
+using TestPlugin.Context;
 
 namespace TestPlugin.Handlers
 {
@@ -16,6 +17,19 @@ namespace TestPlugin.Handlers
         public string Pattern => "/health";
 
         public HandlerHttpMethod HttpMethod => HandlerHttpMethod.Get;
+
+        public HandlerOpenApiInfo? OpenApiInfo { get; } = new(
+            "health",
+            "Health check",
+            ["health"],
+            "Проверка доступности сервиса")
+        {
+            Description = "Возвращает текстовую строку о том, что сервис работает.",
+            Responses =
+            [
+                new(200, PluginJsonContext.Default.String, "Сервис работает", ContentType.TextPlain)
+            ]
+        };
 
         public Task<HandlerResult> HandleAsync(HandlerRequest request)
         {

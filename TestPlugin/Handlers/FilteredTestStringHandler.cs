@@ -16,5 +16,18 @@ namespace TestPlugin.Handlers
         }
 
         public HandlerFilteringInfo FilteringInfo { get; } = new(true);
+
+        public HandlerOpenApiInfo? OpenApiInfo { get; } = new(
+            "getTestString",
+            "Get test string",
+            ["string"],
+            "Возвращает тестовую строку")
+        {
+            Description = "Возвращает строку в обёртке ответа (filtered).",
+            Responses =
+            [
+                new(200, PluginJsonContext.Default.String)
+            ]
+        };
     }
 }
