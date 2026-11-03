@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Sudzekai.LinCtrl.Plugin\Sudzekai.LinCtrl.Assembly.csproj" />
+    <ProjectReference Include="..\Sudzekai.LinCtrl.Assembly\Sudzekai.LinCtrl.Assembly.csproj" />
   </ItemGroup>
 
 </Project>
