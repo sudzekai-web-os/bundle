@@ -1,35 +1,36 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Sudzekai.LinCtrl.Hosting.Internals.Services.Assembly.Initialization;
 
-namespace Sudzekai.LinCtrl.Hosting 
+namespace Sudzekai.LinCtrl.Hosting
 {
     internal static class AssemblyServicesDependencyInjection
     {
-        extension (IServiceCollection services)
+        extension(IServiceCollection services)
         {
             public IServiceCollection AddAssemblyServices()
             {
-                services.AddAssemblyLifetimeServices();
+                services.AddLoadingServices();
 
-                services.AddAssemblyVTableValidator();
+                services.AddInitializationServices();
 
-                services.AddSingleton<AssemblyLoader>();
+                services.AddSingleton<AssemblyLifetimeHost>();
+
+                return services;
+            }
+
+            private IServiceCollection AddLoadingServices()
+            {
+                services.AddSingleton<IAssemblyLoader, AssemblyVTableLoader>();
 
                 return services;
             }
 
-            private IServiceCollection AddAssemblyVTableValidator()
+            private IServiceCollection AddInitializationServices()
             {
-                services.AddSingleton<IAssemblyVTableFieldValidator, AssemblyVTableGetHttpRequestHandlersDelegateValidator>();
-
-                services.AddSingleton<AssemblyVTableValidator>();
-
-                return services;
-            }
-            
-            private IServiceCollection AddAssemblyLifetimeServices()
-            {
-                services.AddSingleton<AssemblyDisposingHost>();
-                services.AddSingleton<AssemblyInitializationHost>();
+                services.AddSingleton<IAssemblyInitializer, AssemblyInitializer>();
+                services.AddSingleton<IAssemblyInitializer, AssemblyBuilder>();
+                services.AddSingleton<IAssemblyInitializer, AssemblyRequestHandlersLoader>();
+                services.AddSingleton<IAssemblyInitializer, AssemblyInitializationFinalizer>();
 
                 return services;
             }

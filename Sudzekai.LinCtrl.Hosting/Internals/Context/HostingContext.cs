@@ -1,4 +1,4 @@
-﻿namespace Sudzekai.LinCtrl.Hosting 
+﻿namespace Sudzekai.LinCtrl.Hosting
 {
     internal static class HostingContext
     {

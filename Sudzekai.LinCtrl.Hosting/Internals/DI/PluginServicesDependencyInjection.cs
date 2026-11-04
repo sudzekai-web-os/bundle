@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace Sudzekai.LinCtrl.Hosting 
+namespace Sudzekai.LinCtrl.Hosting
 {
     internal static class PluginServicesDependencyInjection
     {
@@ -8,43 +8,33 @@ namespace Sudzekai.LinCtrl.Hosting
         {
             public IServiceCollection AddPluginServices()
             {
-                services.AddPluginLifetimeServices();
-                services.AddPluginManifestValidator();
-                services.AddPluginLoaders();
+                services.AddLoadingServices();
+                services.AddInitializtionServices();
+                services.AddDisposingServices();
+
+                services.AddSingleton<PluginLifetimeHost>();
+                services.AddSingleton<PluginsLifetimeHost>();
 
                 return services;
             }
 
-            private IServiceCollection AddPluginManifestValidator()
+            private IServiceCollection AddLoadingServices()
             {
-                services.AddSingleton<IPluginManifestFieldValidator, PluginManifestVersionValidator>();
-                services.AddSingleton<IPluginManifestFieldValidator, PluginManifestAssembilesValidator>();
-
-                services.AddSingleton<PluginManifestValidator>();
+                services.AddSingleton<IPluginLoader, PluginManifestLoader>();
+                services.AddSingleton<IPluginLoader, PluginAssembliesLoader>();
 
                 return services;
             }
 
-            private IServiceCollection AddPluginLoaders()
+            private IServiceCollection AddInitializtionServices()
             {
-                services.AddSingleton<PluginManifestLoader>();
-
-                services.AddSingleton<PluginDirectoryLoader>();
-
-                services.AddSingleton<PluginsLoadingHost>();
+                services.AddSingleton<IPluginInitializer, PluginAssembliesInitializer>();
                 
                 return services;
             }
 
-            private IServiceCollection AddPluginLifetimeServices()
+            private IServiceCollection AddDisposingServices()
             {
-                services.AddSingleton<PluginsRegistry>();
-
-                services.AddSingleton<PluginDisposingHost>();
-                services.AddSingleton<PluginInitializationHost>();
-
-                services.AddSingleton<PluginsLifetimeHost>();
-
                 return services;
             }
         }

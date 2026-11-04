@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Sudzekai.LinCtrl.Core;
 
-namespace Sudzekai.LinCtrl.Hosting 
+namespace Sudzekai.LinCtrl.Hosting
 {
     public static class WebApplicationBuilderExtensions
     {

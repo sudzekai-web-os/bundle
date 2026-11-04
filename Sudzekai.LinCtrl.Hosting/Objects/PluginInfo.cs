@@ -1,70 +1,83 @@
-﻿namespace Sudzekai.LinCtrl.Hosting 
+﻿using Sudzekai.LinCtrl.Core;
+using Sudzekai.LinCtrl.Hosting.Objects;
+
+namespace Sudzekai.LinCtrl.Hosting
 {
     public class PluginInfo
     {
-        internal PluginInfo(PluginManifest mainfest, IReadOnlyList<AssemblyInfo> assemblyInfos)
+        internal PluginInfo(string directoryPath)
         {
-            Name = mainfest.Name;
-            Version = mainfest.Version;
-            Summary = mainfest.Summary;
-
-            Assemblies = assemblyInfos;
+            DirectoryPath = directoryPath;
         }
 
-        internal bool IsDisposed
+        public PluginLifetime Lifetime { get; private set; }
+
+        public string DirectoryPath
         {
-            get;
-            set
+            get
             {
-                ObjectDisposedException.ThrowIf(IsDisposed, nameof(PluginInfo));
+                ThrowIfDisposed();
+                return field;
+            }
+            internal set
+            {
+                ThrowIfDisposed();
                 field = value;
             }
-        } = false;
+        }
 
-        public bool IsInitialized
+        public PluginManifest Manifest
         {
             get
             {
-                ObjectDisposedException.ThrowIf(IsDisposed, nameof(PluginInfo));
+                ThrowIfDisposed();
+
+                if (field == null)
+                    throw new InvalidOperationException("Manifest was null");
+
                 return field;
             }
-            internal set;
-        } = false;
+            internal set
+            {
+                ThrowIfDisposed();
+                field = value;
+            }
+        }
 
-        public string Name
+        public IReadOnlyList<AssemblyInfo> Assemblies
         {
             get
             {
-                ObjectDisposedException.ThrowIf(IsDisposed, nameof(PluginInfo));
+                ThrowIfOnlyCreated();
+                ThrowIfDisposed();
                 return field;
             }
-        } = string.Empty;
-
-        public string Version
-        {
-            get
+            internal set
             {
-                ObjectDisposedException.ThrowIf(IsDisposed, nameof(PluginInfo));
-                return field;
-            }
-        } = string.Empty;
-
-        public string Summary
-        {
-            get
-            {
-                ObjectDisposedException.ThrowIf(IsDisposed, nameof(PluginInfo));
-                return field;
-            }
-        } = string.Empty;
-
-        internal IReadOnlyList<AssemblyInfo> Assemblies
-        {
-            get
-            {
-                ObjectDisposedException.ThrowIf(IsDisposed, nameof(PluginInfo));
-                return field;
+                ThrowIfDisposed();
+                field = value;
             }
         } = [];
+
+        internal void SetLoaded()
+            => Lifetime = PluginLifetime.Loaded;
+
+        internal void SetInitialized()
+            => Lifetime = PluginLifetime.Initialized;
+
+        internal void SetDisposed()
+            => Lifetime = PluginLifetime.Disposed;
+
+        private void ThrowIfDisposed()
+            => ObjectDisposedException.ThrowIf(Lifetime == PluginLifetime.Disposed, this);
+
+        private void ThrowIfOnlyCreated()
+        {
+            if (Lifetime == PluginLifetime.Created)
+                throw new InvalidOperationException("Plugin was neither loaded nor initialized.");
+        }
+
+        internal string GetTag()
+            => Path.GetFileName(DirectoryPath);
     }
 }

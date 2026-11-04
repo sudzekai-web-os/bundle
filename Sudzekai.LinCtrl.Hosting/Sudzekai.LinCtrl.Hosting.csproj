@@ -16,11 +16,4 @@
     <ProjectReference Include="..\Sudzekai.LinCtrl.Core\Sudzekai.LinCtrl.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Internals\Services\Assembly\Lifetime\Disposing\Handlers\" />
-    <Folder Include="Internals\Services\Assembly\Lifetime\Initialization\Handlers\" />
-    <Folder Include="Internals\Services\RequestHandler\Loading\Handlers\" />
-    <Folder Include="Internals\Services\RequestHandler\Unloading\Handlers\" />
-  </ItemGroup>
-
 </Project>

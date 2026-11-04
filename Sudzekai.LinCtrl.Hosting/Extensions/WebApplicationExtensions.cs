@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
-namespace Sudzekai.LinCtrl.Hosting 
+namespace Sudzekai.LinCtrl.Hosting
 {
     public static class WebApplicationExtensions
     {
@@ -10,33 +9,35 @@ namespace Sudzekai.LinCtrl.Hosting
         {
             public void MapLinCtrlInfrastructure()
             {
-                application.Services.GetRequiredService<RequestHandlerLoader>().RouteBuilder = application;
-                application.Services.GetRequiredService<RequestHandlerUnloader>().RouteBuilder = application;
             }
 
             public void LoadPlugins(string pluginsDirectoryPath = "plugins")
             {
-                var lifetime = application.Services.GetRequiredService<IHostApplicationLifetime>();
-
                 var pluginsLifetime = application.Services.GetRequiredService<PluginsLifetimeHost>();
 
-                lifetime.ApplicationStopping.Register(pluginsLifetime.UnloadPlugins);
+                pluginsLifetime.Load(pluginsDirectoryPath);
+            }
 
-                application.Services.GetRequiredService<PluginsLoadingHost>().Load();
+            public void InitializePlugins()
+            {
+                var pluginsLifetime = application.Services.GetRequiredService<PluginsLifetimeHost>();
+
+                pluginsLifetime.Initialize(pluginsLifetime.GetLoadedPlugins());
             }
 
             public IReadOnlyList<PluginInfo> GetPlugins()
             {
-                var registry = application.Services.GetRequiredService<PluginsRegistry>();
+                var pluginsLifetime = application.Services.GetRequiredService<PluginsLifetimeHost>();
 
-                return registry.GetList();
+                return pluginsLifetime.GetPlugins();
             }
 
             public void UnloadPlugins()
             {
-                var pluginsLifetime = application.Services.GetRequiredService<PluginsLifetimeHost>();
+                var pluginsLifetime = application.Services.GetRequiredService<PluginLifetimeHost>();
 
-                pluginsLifetime.UnloadPlugins();
+                foreach (var plugin in pluginsLifetime.GetPlugins())
+                    pluginsLifetime.Dispose(plugin);
             }
         }
     }

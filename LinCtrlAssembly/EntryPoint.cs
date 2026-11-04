@@ -1,4 +1,7 @@
-﻿using Sudzekai.LinCtrl.Assembly;
+﻿using LinCtrlAssembly.Context;
+using LinCtrlAssembly.Handlers;
+using Microsoft.Extensions.DependencyInjection;
+using Sudzekai.LinCtrl.Assembly;
 using Sudzekai.LinCtrl.Assembly.Context;
 using Sudzekai.LinCtrl.Core;
 using System.Runtime.InteropServices;
@@ -10,6 +13,8 @@ namespace LinCtrlAssembly
         [UnmanagedCallersOnly(EntryPoint = AssemblyExports.GetVTable)]
         public static unsafe AssemblyVTableDescriptor* GetVTable()
         {
+            CoreContext.AddTypeInfoResolver(AssemblyJsonContext.Default);
+
             AssemblyContext ctx = new()
             {
                 InitializeDelegate = Init,
@@ -27,6 +32,8 @@ namespace LinCtrlAssembly
         private static int Init()
         {
             _builder = AssemblyHost.CreateBuilder();
+
+            _builder.Services.AddScoped<IHttpRequestHandler, ResponseObjectRequestHandler>();
 
             return 0;
         }

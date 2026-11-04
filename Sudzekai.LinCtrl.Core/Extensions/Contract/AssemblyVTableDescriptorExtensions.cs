@@ -29,7 +29,8 @@ namespace Sudzekai.LinCtrl.Core
                 return new()
                 {
                     AbiVersion = abiVersion,
-                    GetHttpRequestHandlersDelegate = getHttpRequestHandlersDelegateDescriptorPointer
+                    GetHttpRequestHandlersDelegate = getHttpRequestHandlersDelegateDescriptorPointer,
+                    FreeAssemblyVTableDelegate = freeAssemblyVTableDelegateDescriptorPointer
                 };
             }
 
@@ -99,6 +100,9 @@ namespace Sudzekai.LinCtrl.Core
                 var getHttpRequestHandlersDelegate = descriptor.GetHttpRequestHandlersDelegate == null
                     ? null : descriptor.GetHttpRequestHandlersDelegate->ToManaged();
 
+                var freeAssemblyVTableDelegate = descriptor.FreeAssemblyVTableDelegate == null
+                    ? null : descriptor.FreeAssemblyVTableDelegate->ToManaged();
+
                 var getHttpRequestHandlersMetadataDelegate = descriptor.GetHttpRequestHandlersMetadataDelegate == null
                     ? null : descriptor.GetHttpRequestHandlersMetadataDelegate->ToManaged();
 
@@ -126,6 +130,7 @@ namespace Sudzekai.LinCtrl.Core
                 return new(descriptor.AbiVersion)
                 {
                     GetHttpRequestHandlersDelegate = getHttpRequestHandlersDelegate,
+                    FreeAssemblyVTableDelegate = freeAssemblyVTableDelegate,
                     GetHttpRequestHandlersMetadataDelegate = getHttpRequestHandlersMetadataDelegate,
                     FreeHttpRequestHandlersMetadataDelegate = freeHttpRequestHandlersMetadataDelegate,
                     AssemblyDisposeDelegate = assemblyDisposeDelegate,

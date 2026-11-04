@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 
 namespace Sudzekai.LinCtrl.Core 
 {
@@ -9,5 +10,8 @@ namespace Sudzekai.LinCtrl.Core
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             PropertyNameCaseInsensitive = true
         };
-    }
+
+        public static void AddTypeInfoResolver(IJsonTypeInfoResolver resolver)
+            => JsonSerializerOptions.TypeInfoResolverChain.Add(resolver);
+    } 
 }

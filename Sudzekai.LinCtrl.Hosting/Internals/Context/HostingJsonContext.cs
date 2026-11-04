@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using Sudzekai.LinCtrl.Hosting.Objects;
+using System.Text.Json.Serialization;
 
 namespace Sudzekai.LinCtrl.Hosting
 {

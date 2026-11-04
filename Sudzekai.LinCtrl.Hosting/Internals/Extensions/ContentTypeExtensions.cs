@@ -1,6 +1,6 @@
 ﻿using Sudzekai.LinCtrl.Core;
 
-namespace Sudzekai.LinCtrl.Hosting 
+namespace Sudzekai.LinCtrl.Hosting
 {
     internal static class ContentTypeExtensions
     {
