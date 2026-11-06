@@ -14,10 +14,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Sudzekai.LinCtrl.Abi.Allocation\Sudzekai.LinCtrl.Abi.Allocation.csproj" />
+    <ProjectReference Include="..\Sudzekai.LinCtrl.Abi.Managed\Sudzekai.LinCtrl.Abi.Managed.csproj" />
+    <ProjectReference Include="..\Sudzekai.LinCtrl.Abi\Sudzekai.LinCtrl.Abi.csproj" />
     <ProjectReference Include="..\Sudzekai.LinCtrl.Core\Sudzekai.LinCtrl.Core.csproj" />
-    <ProjectReference Include="..\Sudzekai.LinCtrl.Assembly.Generator\Sudzekai.LinCtrl.Assembly.Generator.csproj"
-                      OutputItemType="Analyzer"
-                      ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\Sudzekai.LinCtrl.Assembly.Generator\Sudzekai.LinCtrl.Assembly.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>

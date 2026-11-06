@@ -7,11 +7,11 @@ namespace LinCtrlAssembly.Handlers
     {
         public string Pattern => "object/error";
 
-        public RequestHandlerHttpMethod HttpMethod => RequestHandlerHttpMethod.Get;
+        public HttpRequestMethod HttpMethod => HttpRequestMethod.Get;
 
         public Task<HttpResponse> HandleAsync(HttpRequestDto request)
         {
-            return Task.FromResult(HttpResponse.Create(System.Net.HttpStatusCode.OK).As(ContentType.ApplicationJson).WithData(new UnregisteredResponseObject()));
+            return Task.FromResult(HttpResponse.Create(System.Net.HttpStatusCode.OK).As(ResponseContentType.ApplicationJson).WithData(new UnregisteredResponseObject()));
         }
     }
 }

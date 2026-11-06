@@ -5,7 +5,7 @@ namespace Sudzekai.LinCtrl.Hosting
 {
     internal interface IResponseWriter
     {
-        ContentType ContentType { get; }
+        ResponseContentType ContentType { get; }
         Task WriteAsync(AspHttpResponse ctx, byte[] data);
     }
 }

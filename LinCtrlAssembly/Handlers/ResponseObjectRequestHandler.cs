@@ -8,11 +8,11 @@ namespace LinCtrlAssembly.Handlers
     {
         public string Pattern => "object";
 
-        public RequestHandlerHttpMethod HttpMethod => RequestHandlerHttpMethod.Get;
+        public HttpRequestMethod HttpMethod => HttpRequestMethod.Get;
 
         public Task<HttpResponse> HandleAsync(HttpRequestDto request)
         {
-            return Task.FromResult(HttpResponse.Create(HttpStatusCode.OK).As(ContentType.ApplicationJson).WithData(new ResponseObject("OK", 200)));
+            return Task.FromResult(HttpResponse.Create(HttpStatusCode.OK).As(ResponseContentType.ApplicationJson).WithData(new ResponseObject("OK", 200)));
         }
     }
 }

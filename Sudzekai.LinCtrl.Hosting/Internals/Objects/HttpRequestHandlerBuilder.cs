@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Sudzekai.LinCtrl.Abi.Managed;
 using Sudzekai.LinCtrl.Core;
 
 namespace Sudzekai.LinCtrl.Hosting
@@ -11,9 +12,9 @@ namespace Sudzekai.LinCtrl.Hosting
             set;
         }
 
-        public IHttpRequestHandler Handler { get; }
+        public IRequestHandler Handler { get; }
 
-        public HttpRequestHandlerBuilder(IHttpRequestHandler handler)
+        public HttpRequestHandlerBuilder(IRequestHandler handler)
         {
             Handler = handler;
         }

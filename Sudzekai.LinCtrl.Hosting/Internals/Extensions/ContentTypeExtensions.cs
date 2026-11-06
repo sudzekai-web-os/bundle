@@ -4,47 +4,47 @@ namespace Sudzekai.LinCtrl.Hosting
 {
     internal static class ContentTypeExtensions
     {
-        extension(ContentType contentType)
+        extension(ResponseContentType contentType)
         {
-            public static ContentType FromMimeString(string? contentTypeString)
+            public static ResponseContentType FromMimeString(string? contentTypeString)
             {
                 if (string.IsNullOrWhiteSpace(contentTypeString))
-                    return ContentType.None;
+                    return ResponseContentType.None;
 
                 var mediaType = contentTypeString.Split(';', 2)[0].Trim();
 
                 return mediaType.ToLowerInvariant() switch
                 {
-                    "application/json" => ContentType.ApplicationJson,
-                    "text/plain" => ContentType.TextPlain,
-                    "text/html" => ContentType.TextHtml,
-                    "text/csv" => ContentType.TextCsv,
-                    "application/octet-stream" => ContentType.ApplicationOctetStream,
-                    "application/x-www-form-urlencoded" => ContentType.ApplicationFormUrlEncoded,
-                    "image/png" => ContentType.ImagePng,
-                    "image/jpeg" => ContentType.ImageJpeg,
-                    "image/webp" => ContentType.ImageWebp,
-                    "image/svg+xml" => ContentType.ImageSvgXml,
-                    "application/pdf" => ContentType.ApplicationPdf,
-                    "application/zip" => ContentType.ApplicationZip,
+                    "application/json" => ResponseContentType.ApplicationJson,
+                    "text/plain" => ResponseContentType.TextPlain,
+                    "text/html" => ResponseContentType.TextHtml,
+                    "text/csv" => ResponseContentType.TextCsv,
+                    "application/octet-stream" => ResponseContentType.ApplicationOctetStream,
+                    "application/x-www-form-urlencoded" => ResponseContentType.ApplicationFormUrlEncoded,
+                    "image/png" => ResponseContentType.ImagePng,
+                    "image/jpeg" => ResponseContentType.ImageJpeg,
+                    "image/webp" => ResponseContentType.ImageWebp,
+                    "image/svg+xml" => ResponseContentType.ImageSvgXml,
+                    "application/pdf" => ResponseContentType.ApplicationPdf,
+                    "application/zip" => ResponseContentType.ApplicationZip,
                     _ => throw new ArgumentException($"Unsupported content type: '{contentTypeString}'", nameof(contentTypeString))
                 };
             }
 
             public string ToMimeString() => contentType switch
             {
-                ContentType.ApplicationJson => "application/json",
-                ContentType.TextPlain => "text/plain",
-                ContentType.TextHtml => "text/html",
-                ContentType.TextCsv => "text/csv",
-                ContentType.ApplicationOctetStream => "application/octet-stream",
-                ContentType.ApplicationFormUrlEncoded => "application/x-www-form-urlencoded",
-                ContentType.ImagePng => "image/png",
-                ContentType.ImageJpeg => "image/jpeg",
-                ContentType.ImageWebp => "image/webp",
-                ContentType.ImageSvgXml => "image/svg+xml",
-                ContentType.ApplicationPdf => "application/pdf",
-                ContentType.ApplicationZip => "application/zip",
+                ResponseContentType.ApplicationJson => "application/json",
+                ResponseContentType.TextPlain => "text/plain",
+                ResponseContentType.TextHtml => "text/html",
+                ResponseContentType.TextCsv => "text/csv",
+                ResponseContentType.ApplicationOctetStream => "application/octet-stream",
+                ResponseContentType.ApplicationFormUrlEncoded => "application/x-www-form-urlencoded",
+                ResponseContentType.ImagePng => "image/png",
+                ResponseContentType.ImageJpeg => "image/jpeg",
+                ResponseContentType.ImageWebp => "image/webp",
+                ResponseContentType.ImageSvgXml => "image/svg+xml",
+                ResponseContentType.ApplicationPdf => "application/pdf",
+                ResponseContentType.ApplicationZip => "application/zip",
                 _ => throw new ArgumentOutOfRangeException(nameof(contentType), contentType, null)
             };
         }

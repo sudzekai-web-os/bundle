@@ -9,7 +9,7 @@ namespace Sudzekai.LinCtrl.Hosting
         {
             public void AddLinCtrlInfrastructure()
             {
-                CoreContext.JsonSerializerOptions.TypeInfoResolverChain.Add(HostingJsonContext.Default);
+                LinCtrlContext.AddTypeInfoResolver(HostingContext.Default);
                 builder.Services.AddAssemblyServices();
                 builder.Services.RegisterRequestHandlerServices();
                 builder.Services.AddPluginServices();

@@ -13,6 +13,8 @@ namespace Sudzekai.LinCtrl.Assembly
         internal AssemblyHostBuilder(AssemblyContext ctx)
         {
             _context = ctx;
+
+
         }
 
         public IServiceCollection Services { get => _services; }

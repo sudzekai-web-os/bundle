@@ -15,7 +15,7 @@ namespace Sudzekai.LinCtrl.Hosting
 
             var json = File.ReadAllText(manifestPath);
 
-            info.Manifest = (PluginManifest)JsonSerializer.Deserialize(json, CoreContext.JsonSerializerOptions.GetTypeInfo(typeof(PluginManifest)))!;
+            info.Manifest = (PluginManifest)JsonSerializer.Deserialize(json, LinCtrlContext.JsonSerializerOptions.GetTypeInfo(typeof(PluginManifest)))!;
         }
     }
 }

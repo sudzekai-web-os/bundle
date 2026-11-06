@@ -6,7 +6,7 @@ namespace Sudzekai.LinCtrl.Hosting.Internals.Services.Handlers.Services
 {
     internal class JsonResponseWriter : IResponseWriter
     {
-        public ContentType ContentType => ContentType.ApplicationJson;
+        public ResponseContentType ContentType => ResponseContentType.ApplicationJson;
 
         public async Task WriteAsync(AspHttpResponse response, byte[] data)
         {

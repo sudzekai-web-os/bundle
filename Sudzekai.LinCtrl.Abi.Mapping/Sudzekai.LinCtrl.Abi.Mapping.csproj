@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sudzekai.LinCtrl.Abi.Managed\Sudzekai.LinCtrl.Abi.Managed.csproj" />
+    <ProjectReference Include="..\Sudzekai.LinCtrl.Abi\Sudzekai.LinCtrl.Abi.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,13 +1,18 @@
-﻿using Sudzekai.LinCtrl.Core;
+﻿using Sudzekai.LinCtrl.Abi;
+using Sudzekai.LinCtrl.Abi.Allocation;
+using Sudzekai.LinCtrl.Abi.Managed;
+using Sudzekai.LinCtrl.Core;
+using Sudzekai.LinCtrl.Hosting.Internals.Extensions.Abi;
+using Sudzekai.LinCtrl.Hosting.Objects;
+using System.Text.Json.Serialization;
 
 namespace Sudzekai.LinCtrl.Hosting
 {
-    internal static class HostingContext
+    [JsonSerializable(typeof(PluginManifest))]
+    internal partial class HostingContext : JsonSerializerContext
     {
-        public const uint AbiVersion = 1;
+        private static HostVTable _vTable = new() { AbiVersion = LinCtrlContext.AbiVersion };
 
-        private static HostVTable _vTable = new(AbiVersion);
-
-        public unsafe static HostVTableDescriptor* VTableDescriptorPointer = AllocationUtilities.AllocCoTaskMem(HostVTableDescriptor.Alloc(_vTable));
+        public unsafe static HostVTableDescriptor* VTableDescriptorPointer = CoTaskAllocator.Alloc(HostVTableAllocator.Alloc(_vTable));
     }
 }

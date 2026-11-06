@@ -8,6 +8,8 @@ namespace Sudzekai.LinCtrl.Assembly
 {
     public class AssemblyHost
     {
+        private List<IHttpRequestHandler> _handlersCache = [];
+        
         internal AssemblyHost(IServiceProvider provider)
         {
             Services = provider;
@@ -22,9 +24,19 @@ namespace Sudzekai.LinCtrl.Assembly
         {
             var factory = Services.GetRequiredService<ILoggerFactory>();
 
-            return [.. Services.GetServices<IHttpRequestHandler>()
-                .Select(h => (IHttpRequestHandler)new HttpRequestHandlerDecorator(
-                    h, factory.CreateLogger(h.GetType().FullName!)))];
+            if (_handlersCache.Count == 0)
+                _handlersCache = [.. Services.GetServices<IHttpRequestHandler>()];
+
+            return [.. _handlersCache
+                    .Select(h => (IHttpRequestHandler)new HttpRequestHandlerDecorator(
+                        h, factory.CreateLogger(h.GetType().FullName!)))];
+        }
+
+        public string GetHandlersMetadata()
+        {
+            
+
+            return string.Empty;
         }
     }
 }

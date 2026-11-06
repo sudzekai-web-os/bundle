@@ -1,4 +1,5 @@
-﻿using Sudzekai.LinCtrl.Core;
+﻿using Sudzekai.LinCtrl.Abi.Managed;
+using Sudzekai.LinCtrl.Core;
 
 namespace Sudzekai.LinCtrl.Hosting
 {
@@ -24,7 +25,7 @@ namespace Sudzekai.LinCtrl.Hosting
 
                 return new()
                 {
-                    HttpMethod = RequestHandlerHttpMethod.FromHttpMethodString(req.Method),
+                    HttpMethod = HttpRequestMethod.FromHttpMethodString(req.Method),
                     Host = req.Host.Host,
                     Scheme = req.Scheme,
                     Path = req.Path.ToString(),
@@ -38,7 +39,7 @@ namespace Sudzekai.LinCtrl.Hosting
                     RouteValues = req.RouteValues.ToDictionary(p => p.Key, p => p.Value?.ToString() ?? ""),
                     Cookies = req.Cookies.ToDictionary(),
 
-                    ContentType = ContentType.FromMimeString(req.ContentType),
+                    ContentType = ResponseContentType.FromMimeString(req.ContentType),
 
                     Body = body
                 };

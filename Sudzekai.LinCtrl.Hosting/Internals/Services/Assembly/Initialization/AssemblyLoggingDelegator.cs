@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Sudzekai.LinCtrl.Core;
 
 namespace Sudzekai.LinCtrl.Hosting
 {
@@ -8,7 +7,7 @@ namespace Sudzekai.LinCtrl.Hosting
         ILogger<AssemblyLoggingDelegator> logger,
         IServiceProvider provider) : IAssemblyInitializer
     {
-        public unsafe void Initialize(AssemblyInfo info)
+        public void Initialize(AssemblyInfo info)
         {
             logger.LogDebug("[{tag}] Delegating logging...", info.GetTag());
             
