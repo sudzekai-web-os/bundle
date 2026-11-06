@@ -4,6 +4,11 @@ namespace Sudzekai.LinCtrl.Assembly.Context
 {
     public class AssemblyContext
     {
+        public unsafe AssemblyContext(HostVTableDescriptor* hostVTableDescriptorPointer)
+        {
+            
+        }
+
         public const uint AbiVersion = 1;
 
         /// <summary>
@@ -150,63 +155,12 @@ namespace Sudzekai.LinCtrl.Assembly.Context
                 GetHttpRequestHandlersDelegate = GetHttpRequestHandlersDelegate,
                 GetHttpRequestHandlersMetadataDelegate = GetHttpRequestHandlersMetadataDelegate ?? (() => { return "EMPTY"; }),
 
-                FreeHttpRequestHandlersMetadataDelegate = _freeHttpRequestHandlersMetadataDelegate,
-                FreeLogEntryDelegate = _freeLogEntryDelegate,
-                FreeHttpResponseDelegate = _freeHttpResponseDelegate,
                 FreeAssemblyVTableDelegate = _freeAssemblyVTableDelegate,
                 AssemblyDisposeDelegate = _assemblyDisposeDelegate
             };
 
             return AllocationUtilities.AllocCoTaskMem(AssemblyVTableDescriptor.Alloc(vTable));
         }
-
-        private readonly unsafe FreeHttpRequestHandlersMetadataDelegate _freeHttpRequestHandlersMetadataDelegate = (desc) =>
-        {
-            if (desc == null)
-                return 1;
-
-            try
-            {
-                AllocationUtilities.FreeCoTaskMemIfNotNull(ref desc);
-                return 0;
-            }
-            catch
-            {
-                return 2;
-            }
-        };
-
-        private readonly unsafe FreeLogEntryDelegate _freeLogEntryDelegate = (desc) =>
-        {
-            if (desc == null)
-                return 1;
-
-            try
-            {
-                AllocationUtilities.FreeCoTaskMemIfNotNull(ref desc);
-                return 0;
-            }
-            catch
-            {
-                return 2;
-            }
-        };
-
-        private readonly unsafe FreeHttpResponseDelegate _freeHttpResponseDelegate = (desc) =>
-        {
-            if (desc == null)
-                return 1;
-
-            try
-            {
-                AllocationUtilities.FreeCoTaskMemIfNotNull(ref desc);
-                return 0;
-            }
-            catch
-            {
-                return 2;
-            }
-        };
 
         private readonly unsafe FreeAssemblyVTableDelegate _freeAssemblyVTableDelegate = (desc) =>
         {

@@ -28,7 +28,9 @@ namespace Sudzekai.LinCtrl.Hosting
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError("Exception while loading assembly: {message}. Assembly skipped (path: {path})", ex.Message, assemblyFullPath);
+                    var tag = Path.GetFileName(Path.GetDirectoryName(assemblyFullPath)) + "/" + Path.GetFileNameWithoutExtension(assemblyFullPath);
+
+                    logger.LogError("[{tag}] Exception while loading assembly: {message}. Assembly skipped", tag, ex.Message);
                 }
             }
 

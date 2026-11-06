@@ -1,5 +1,5 @@
 
 namespace Sudzekai.LinCtrl.Core 
 {
-    public delegate void LogDelegate(LogEntry entry);
+    public unsafe delegate void LogDelegate(LogEntry entry);
 }

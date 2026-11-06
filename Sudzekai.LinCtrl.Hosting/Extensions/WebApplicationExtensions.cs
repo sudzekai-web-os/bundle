@@ -9,6 +9,7 @@ namespace Sudzekai.LinCtrl.Hosting
         {
             public void MapLinCtrlInfrastructure()
             {
+                application.Services.GetRequiredService<RequestHandlerBuilderProvider>().SetRouteBuilder(application);
             }
 
             public void LoadPlugins(string pluginsDirectoryPath = "plugins")

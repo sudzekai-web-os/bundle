@@ -40,25 +40,19 @@ namespace Sudzekai.LinCtrl.Core
                 ArgumentNullException.ThrowIfNull(source.FreeAssemblyVTableDelegate, nameof(source.FreeAssemblyVTableDelegate));
 
                 ArgumentNullException.ThrowIfNull(source.GetHttpRequestHandlersMetadataDelegate, nameof(source.GetHttpRequestHandlersMetadataDelegate));
-                ArgumentNullException.ThrowIfNull(source.FreeHttpRequestHandlersMetadataDelegate, nameof(source.FreeHttpRequestHandlersMetadataDelegate));
                 ArgumentNullException.ThrowIfNull(source.AssemblyDisposeDelegate, nameof(source.AssemblyDisposeDelegate));
                 ArgumentNullException.ThrowIfNull(source.InitializeDelegate, nameof(source.InitializeDelegate));
                 ArgumentNullException.ThrowIfNull(source.BuildDelegate, nameof(source.BuildDelegate));
                 ArgumentNullException.ThrowIfNull(source.DelegateLoggingDelegate, nameof(source.DelegateLoggingDelegate));
-                ArgumentNullException.ThrowIfNull(source.FreeLogEntryDelegate, nameof(source.FreeLogEntryDelegate));
-                ArgumentNullException.ThrowIfNull(source.FreeHttpResponseDelegate, nameof(source.FreeHttpResponseDelegate));
 
                 GetHttpRequestHandlersDelegateDescriptor getHttpRequestHandlersDelegateDescriptor = default;
                 FreeAssemblyVTableDelegateDescriptor freeAssemblyVTableDelegateDescriptor = default;
 
                 GetHttpRequestHandlersMetadataDelegateDescriptor getHttpRequestHandlersMetadataDelegateDescriptor = default;
-                FreeHttpRequestHandlersMetadataDelegateDescriptor freeHttpRequestHandlersMetadataDelegateDescriptor = default;
                 AssemblyDisposeDelegateDescriptor assemblyDisposeDelegateDescriptor = default;
                 InitializeDelegateDescriptor initializeDelegateDescriptor = default;
                 BuildDelegateDescriptor buildDelegateDescriptor = default;
                 DelegateLogginDelegateDescriptor delegateLogginDelegateDescriptor = default;
-                FreeLogEntryDelegateDescriptor freeLogEntryDelegateDescriptor = default;
-                FreeHttpResponseDelegateDescriptor freeHttpResponseDelegateDescriptor = default;
 
                 try
                 {
@@ -66,24 +60,18 @@ namespace Sudzekai.LinCtrl.Core
                     freeAssemblyVTableDelegateDescriptor = FreeAssemblyVTableDelegateDescriptor.Alloc(source.FreeAssemblyVTableDelegate);
 
                     getHttpRequestHandlersMetadataDelegateDescriptor = GetHttpRequestHandlersMetadataDelegateDescriptor.Alloc(source.GetHttpRequestHandlersMetadataDelegate);
-                    freeHttpRequestHandlersMetadataDelegateDescriptor = FreeHttpRequestHandlersMetadataDelegateDescriptor.Alloc(source.FreeHttpRequestHandlersMetadataDelegate);
                     assemblyDisposeDelegateDescriptor = AssemblyDisposeDelegateDescriptor.Alloc(source.AssemblyDisposeDelegate);
                     initializeDelegateDescriptor = InitializeDelegateDescriptor.Alloc(source.InitializeDelegate);
                     buildDelegateDescriptor = BuildDelegateDescriptor.Alloc(source.BuildDelegate);
                     delegateLogginDelegateDescriptor = DelegateLogginDelegateDescriptor.Alloc(source.DelegateLoggingDelegate);
-                    freeLogEntryDelegateDescriptor = FreeLogEntryDelegateDescriptor.Alloc(source.FreeLogEntryDelegate);
-                    freeHttpResponseDelegateDescriptor = FreeHttpResponseDelegateDescriptor.Alloc(source.FreeHttpResponseDelegate);
 
                     var result = Alloc(source.AbiVersion, getHttpRequestHandlersDelegateDescriptor, freeAssemblyVTableDelegateDescriptor);
 
                     result.GetHttpRequestHandlersMetadataDelegate = AllocationUtilities.AllocCoTaskMem(getHttpRequestHandlersMetadataDelegateDescriptor);
-                    result.FreeHttpRequestHandlersMetadataDelegate = AllocationUtilities.AllocCoTaskMem(freeHttpRequestHandlersMetadataDelegateDescriptor);
                     result.AssemblyDisposeDelegate = AllocationUtilities.AllocCoTaskMem(assemblyDisposeDelegateDescriptor);
                     result.InitializeDelegate = AllocationUtilities.AllocCoTaskMem(initializeDelegateDescriptor);
                     result.BuildDelegate = AllocationUtilities.AllocCoTaskMem(buildDelegateDescriptor);
                     result.DelegateLogginDelegate = AllocationUtilities.AllocCoTaskMem(delegateLogginDelegateDescriptor);
-                    result.FreeLogEntryDelegate = AllocationUtilities.AllocCoTaskMem(freeLogEntryDelegateDescriptor);
-                    result.FreeHttpResponseDelegate = AllocationUtilities.AllocCoTaskMem(freeHttpResponseDelegateDescriptor);
 
                     return result;
                 }
@@ -106,9 +94,6 @@ namespace Sudzekai.LinCtrl.Core
                 var getHttpRequestHandlersMetadataDelegate = descriptor.GetHttpRequestHandlersMetadataDelegate == null
                     ? null : descriptor.GetHttpRequestHandlersMetadataDelegate->ToManaged();
 
-                var freeHttpRequestHandlersMetadataDelegate = descriptor.FreeHttpRequestHandlersMetadataDelegate == null
-                    ? null : descriptor.FreeHttpRequestHandlersMetadataDelegate->ToManaged();
-
                 var assemblyDisposeDelegate = descriptor.AssemblyDisposeDelegate == null
                     ? null : descriptor.AssemblyDisposeDelegate->ToManaged();
 
@@ -121,24 +106,15 @@ namespace Sudzekai.LinCtrl.Core
                 var delegateLogginDelegate = descriptor.DelegateLogginDelegate == null
                     ? null : descriptor.DelegateLogginDelegate->ToManaged();
 
-                var freeLogEntryDelegate = descriptor.FreeLogEntryDelegate == null
-                    ? null : descriptor.FreeLogEntryDelegate->ToManaged();
-
-                var freeHttpResponseDelegate = descriptor.FreeHttpResponseDelegate == null
-                    ? null : descriptor.FreeHttpResponseDelegate->ToManaged();
-
                 return new(descriptor.AbiVersion)
                 {
                     GetHttpRequestHandlersDelegate = getHttpRequestHandlersDelegate,
                     FreeAssemblyVTableDelegate = freeAssemblyVTableDelegate,
                     GetHttpRequestHandlersMetadataDelegate = getHttpRequestHandlersMetadataDelegate,
-                    FreeHttpRequestHandlersMetadataDelegate = freeHttpRequestHandlersMetadataDelegate,
                     AssemblyDisposeDelegate = assemblyDisposeDelegate,
                     InitializeDelegate = initializeDelegate,
                     BuildDelegate = buildDelegate,
-                    DelegateLoggingDelegate = delegateLogginDelegate,
-                    FreeLogEntryDelegate = freeLogEntryDelegate,
-                    FreeHttpResponseDelegate = freeHttpResponseDelegate
+                    DelegateLoggingDelegate = delegateLogginDelegate
                 };
             }
         }

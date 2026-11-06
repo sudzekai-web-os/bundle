@@ -8,7 +8,7 @@ builder.AddLinCtrlInfrastructure();
 builder.Logging.ClearProviders();
 
 builder.Services.AddSerilog(cfg => cfg
-    .MinimumLevel.Debug()
+    .MinimumLevel.Information()
     .WriteTo.Console(outputTemplate: "{Timestamp:HH:mm:ss.fff} {Level:u3} {Message:lj}{NewLine}{Exception}"));
 
 var app = builder.Build();

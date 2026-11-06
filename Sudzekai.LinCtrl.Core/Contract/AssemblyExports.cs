@@ -2,6 +2,6 @@
 {
     public static class AssemblyExports
     {
-        public const string GetVTable = "get_virtual_table";
+        public const string ExchangeVTables = "exchange_virtual_tables";
     }
 }

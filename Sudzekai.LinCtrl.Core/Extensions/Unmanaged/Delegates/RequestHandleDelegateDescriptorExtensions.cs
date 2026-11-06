@@ -1,7 +1,7 @@
 using System.Net;
 using System.Runtime.InteropServices;
 
-namespace Sudzekai.LinCtrl.Core 
+namespace Sudzekai.LinCtrl.Core
 {
     public static unsafe class RequestHandleDelegateDescriptorExtensions
     {
@@ -80,19 +80,19 @@ namespace Sudzekai.LinCtrl.Core
 
         private static DescribedRequestHandleDelegate GetDescribedDelegate(
             RequestHandleDelegate handleDelegate)
-            => (HttpRequestDescriptor* descriptor) =>
+            => descriptor =>
             {
                 try
                 {
                     if (descriptor == null)
-                        return AllocateErrorResponse();
+                        return AllocateErrorResponse(1);
 
                     var request = descriptor->ToManaged();
 
                     var response = handleDelegate(request).GetAwaiter().GetResult();
 
                     if (response == null)
-                        return AllocateErrorResponse();
+                        return AllocateErrorResponse(2);
 
                     var descriptorResult = HttpResponseDescriptor.Alloc(response);
 
@@ -108,16 +108,16 @@ namespace Sudzekai.LinCtrl.Core
                 }
                 catch
                 {
-                    return AllocateErrorResponse();
+                    return AllocateErrorResponse(3);
                 }
             };
 
-        private static HttpResponseDescriptor* AllocateErrorResponse()
+        private static HttpResponseDescriptor* AllocateErrorResponse(int code)
         {
             try
             {
                 var errored = new HttpResponse(HttpStatusCode.InternalServerError)
-                    .WithData("Internal server error while executing request")
+                    .WithData($"Internal server error while executing request. Internal code: {code})")
                     .As(ContentType.ApplicationJson);
 
                 return AllocationUtilities.AllocCoTaskMem(
@@ -131,7 +131,7 @@ namespace Sudzekai.LinCtrl.Core
 
         private static RequestHandleDelegate GetDelegate(
             delegate* unmanaged[Cdecl]<HttpRequestDescriptor*, HttpResponseDescriptor*> del)
-            => (HttpRequestDto request) =>
+            => request =>
             {
                 ArgumentNullException.ThrowIfNull(request);
 

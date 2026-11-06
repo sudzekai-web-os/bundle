@@ -11,7 +11,7 @@ namespace Sudzekai.LinCtrl.Hosting
         {
             var tag = info.GetTag();
 
-            logger.LogDebug("[{tag}] Receiving virtual table...", tag);
+            logger.LogDebug("[{tag}] Exchanging virtual tables...", tag);
 
             nint handle;
 
@@ -19,22 +19,27 @@ namespace Sudzekai.LinCtrl.Hosting
 
             info.Handle = handle;
 
-            if (!NativeLibrary.TryGetExport(handle, AssemblyExports.GetVTable, out var getVTableAddress))
-                throw new InvalidOperationException($"Assembly not exports \"{AssemblyExports.GetVTable}\"");
+            if (!NativeLibrary.TryGetExport(handle, AssemblyExports.ExchangeVTables, out var getVTableAddress))
+                throw new InvalidOperationException($"Assembly not exports \"{AssemblyExports.ExchangeVTables}\"");
 
-            var func = (delegate* unmanaged[Cdecl]<AssemblyVTableDescriptor*>)getVTableAddress;
+            var func = (delegate* unmanaged[Cdecl]<HostVTableDescriptor*, AssemblyVTableDescriptor**, int>)getVTableAddress;
 
-            var vTableDescriptorPtr = func();
+            AssemblyVTableDescriptor* assemblyVTablePtr = null;
 
-            if (vTableDescriptorPtr == null)
-                throw new InvalidOperationException($"Assembly export \"{AssemblyExports.GetVTable}\" returned null pointer");
+            var result = func(HostingContext.VTableDescriptorPointer, &assemblyVTablePtr);
 
-            var vTable = vTableDescriptorPtr->ToManaged();
+            if (result != 0)
+                throw new InvalidOperationException($"Assembly export \"{AssemblyExports.ExchangeVTables}\" returned error result code: {result}");
+            
+            if (assemblyVTablePtr == null)
+                throw new InvalidOperationException($"Assembly export \"{AssemblyExports.ExchangeVTables}\" returned null virtual table pointer");
+
+            var vTable = assemblyVTablePtr->ToManaged();
 
             info.VTable = vTable;
-            info.VTableDescriptorPointer = vTableDescriptorPtr;
+            info.VTableDescriptorPointer = assemblyVTablePtr;
 
-            logger.LogDebug("[{tag}] Virtual table received", tag);
+            logger.LogDebug("[{tag}] Virtual tables exchanged", tag);
         }
     }
 }

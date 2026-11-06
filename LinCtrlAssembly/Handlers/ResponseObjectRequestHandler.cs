@@ -12,7 +12,7 @@ namespace LinCtrlAssembly.Handlers
 
         public Task<HttpResponse> HandleAsync(HttpRequestDto request)
         {
-            return Task.FromResult(HttpResponse.Create(HttpStatusCode.OK).WithData(new ResponseObject("OK", 200)).As(ContentType.ApplicationJson));
+            return Task.FromResult(HttpResponse.Create(HttpStatusCode.OK).As(ContentType.ApplicationJson).WithData(new ResponseObject("OK", 200)));
         }
     }
 }

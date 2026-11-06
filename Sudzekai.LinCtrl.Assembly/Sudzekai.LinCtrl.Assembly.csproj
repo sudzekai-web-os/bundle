@@ -10,14 +10,11 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.14" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.14" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Sudzekai.LinCtrl.Core\Sudzekai.LinCtrl.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Internals\Services\" />
   </ItemGroup>
 
 </Project>

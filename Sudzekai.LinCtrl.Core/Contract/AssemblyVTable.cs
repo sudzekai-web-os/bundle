@@ -16,12 +16,6 @@
 
 		// dispose delegates
 
-		public FreeHttpRequestHandlersMetadataDelegate? FreeHttpRequestHandlersMetadataDelegate { get; set; }
-
-		public FreeLogEntryDelegate? FreeLogEntryDelegate { get; set; }
-
-		public FreeHttpResponseDelegate? FreeHttpResponseDelegate { get; set; }
-
 		public FreeAssemblyVTableDelegate? FreeAssemblyVTableDelegate { get; set; }
 		
 		public AssemblyDisposeDelegate? AssemblyDisposeDelegate { get; set; }

@@ -28,8 +28,10 @@ namespace Sudzekai.LinCtrl.Hosting
             private IServiceCollection AddInitializationServices()
             {
                 services.AddSingleton<IAssemblyInitializer, AssemblyInitializer>();
+                services.AddSingleton<IAssemblyInitializer, AssemblyLoggingDelegator>();
                 services.AddSingleton<IAssemblyInitializer, AssemblyBuilder>();
                 services.AddSingleton<IAssemblyInitializer, AssemblyRequestHandlersLoader>();
+                services.AddSingleton<IAssemblyInitializer, AssemblyRequestHandlersConfigurator>();
                 services.AddSingleton<IAssemblyInitializer, AssemblyInitializationFinalizer>();
 
                 return services;

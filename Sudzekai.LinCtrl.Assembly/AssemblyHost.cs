@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Sudzekai.LinCtrl.Assembly.Context;
+using Sudzekai.LinCtrl.Assembly.Internals.Objects;
 using Sudzekai.LinCtrl.Core;
 
 namespace Sudzekai.LinCtrl.Assembly
@@ -13,44 +15,16 @@ namespace Sudzekai.LinCtrl.Assembly
 
         public IServiceProvider Services;
 
-        public static AssemblyHostBuilder CreateBuilder()
-            => new();
-
-        public unsafe AssemblyVTableDescriptor* GetVTable()
-        {
-            AssemblyVTable vTable = new(AssemblyContext.AbiVersion)
-            {
-                FreeAssemblyVTableDelegate = GetFreeVTableDelegate()
-            };
-
-            var pointer = AllocationUtilities.AllocCoTaskMem(AssemblyVTableDescriptor.Alloc(vTable));
-
-            return pointer;
-        }
+        public static AssemblyHostBuilder CreateBuilder(AssemblyContext ctx)
+            => new(ctx);
 
         public IHttpRequestHandler[] GetHandlers()
         {
-            var handlers = Services.GetServices<IHttpRequestHandler>();
+            var factory = Services.GetRequiredService<ILoggerFactory>();
 
-            return [.. handlers];
+            return [.. Services.GetServices<IHttpRequestHandler>()
+                .Select(h => (IHttpRequestHandler)new HttpRequestHandlerDecorator(
+                    h, factory.CreateLogger(h.GetType().FullName!)))];
         }
-
-        private static unsafe FreeAssemblyVTableDelegate GetFreeVTableDelegate()
-            => (vTableDescriptorPtr) =>
-            {
-                if (vTableDescriptorPtr == null)
-                    return 1;
-
-                try
-                {
-
-                    vTableDescriptorPtr->Free();
-                    return 0;
-                }
-                catch
-                {
-                    return 2;
-                }
-            };
     }
 }

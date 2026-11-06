@@ -11,7 +11,7 @@ namespace Sudzekai.LinCtrl.Hosting
             var manifestPath = Path.Combine(info.DirectoryPath, "manifest.json");
 
             if (!File.Exists(manifestPath))
-                throw new FileNotFoundException($"Directory not contain manifest.json file. (path: {info.DirectoryPath}");
+                throw new FileNotFoundException($"Directory does not contain manifest.json file");
 
             var json = File.ReadAllText(manifestPath);
 

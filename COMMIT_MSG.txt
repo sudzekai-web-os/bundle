@@ -1,0 +1,40 @@
+Хостинг получил конвейер обработки запросов и обмен VTable между хостом и плагином, логирование переведено на managed-делегирование, из VTable удалены избыточные free-делегаты
+
+ABI и обмен таблицами:
+- ABI переведён с экспорта get_virtual_table на обмен virtual tables: AssemblyExports теперь содержит только exchange_virtual_tables;
+- AssemblyVTableLoader переведён на exchange_virtual_tables: передаёт хостовый HostVTableDescriptor*, принимает AssemblyVTableDescriptor** и проверяет код результата и нулевой указатель;
+- удалён плагинный EntryPoint.cs, вместо него добавлен LinCtrlTestPlugin с [UnmanagedCallersOnly(ExchangeVTables)], который получает HostVTableDescriptor* и возвращает AssemblyVTableDescriptor** через AssemblyContext.GetVtbl();
+- AssemblyContext получил конструктор с HostVTableDescriptor* (сейчас пустой placeholder для будущего использования).
+
+Делегированное логирование:
+- добавлен хост-шаг AssemblyLoggingDelegator, передающий плагину managed LogDelegate через DelegateLoggingDelegate;
+- в AssemblyHostBuilder добавлен метод DelegateLogging, регистрирующий DelegatedLoggerProvider и DelegatedLogger в DI плагина;
+- добавлены внутренние типы DelegatedLogger и DelegatedLoggerProvider, LogDelegate объявлен как unsafe delegate.
+
+Конвейер обработчиков запросов в хосте:
+- добавлен RequestHandlerLifetimeHost, оркестрирующий построение обработчика через IRequestHandlerBuilder;
+- добавлен RequestHandlerBuilderProvider, маппящий маршрут через IEndpointRouteBuilder.MapMethods и развязывающий хост от WebApplication;
+- добавлен RequestHandlerDelegateBuilder, строящий RequestDelegate: чтение запроса через ToRequestDto, вызов HandleAsync и запись ответа (статус, обработка NoContent/NotModified/1xx и HEAD, ContentType.ToMimeString, запись body через IResponseWriter);
+- добавлены IResponseWriter и JsonResponseWriter (JSON через Utf8JsonWriter.WriteRawValue);
+- WebApplicationExtensions.MapLinCtrlInfrastructure теперь вызывает SetRouteBuilder(application);
+- RequestHandlerServicesDependencyInjection перестроен на AddResponseWriters, AddBuildServices и AddRegisterServices с регистрацией RequestHandlerLifetimeHost;
+- добавлен хост-шаг AssemblyRequestHandlersConfigurator, строящий каждый обработчик сборки через RequestHandlerLifetimeHost с логированием пропусков.
+
+Защита обработчиков плагина:
+- добавлен HttpRequestHandlerDecorator, оборачивающий каждый обработчик в перехват исключений с возвратом 500;
+- AssemblyHost.GetHandlers оборачивает обработчики в HttpRequestHandlerDecorator.
+
+Удаление избыточных free-делегатов из VTable:
+- из AssemblyVTable удалены FreeHttpRequestHandlersMetadataDelegate, FreeLogEntryDelegate и FreeHttpResponseDelegate, обновлены AssemblyVTableDescriptor (IsAllocated/Free) и AssemblyVTableDescriptorExtensions (Alloc/ToManaged);
+- HostVTable и HostVTableDescriptor очищены до placeholder: удалены FreeHttpRequestDelegate и FreeLogEntryDelegate, HostVTableDescriptorExtensions упрощён, HostingContext приведён в соответствие;
+- AssemblyContext.GetVtbl перестал задавать удалённые free-делегаты и соответствующие приватные поля;
+- AssemblyLoggingDelegator избавлен от null-проверки FreeLogEntryDelegate;
+- удалены 12 типов, дескрипторов и extension-классов удалённых free-делегатов.
+
+Прочее:
+- AllocateErrorResponse в RequestHandleDelegateDescriptorExtensions получил внутренний код ошибки (1/2/3) для диагностики;
+- PluginAssembliesLoader и PluginManifestLoader доработаны по тегам и сообщениям логов;
+- ResponseObjectRequestHandler изменил порядок As(...).WithData(...);
+- LinCtrlHost поднял минимальный уровень Serilog до Information;
+- тестовый плагин дополнен ResponseStringRequestHandler, UnregisteredResponseObjectHandler и UnregisteredResponseObject;
+- в Sudzekai.LinCtrl.Assembly добавлен пакет Microsoft.Extensions.Logging.
