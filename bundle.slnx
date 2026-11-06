@@ -2,6 +2,7 @@
   <Project Path="LinCtrlHost/LinCtrlHost.csproj" />
   <Project Path="LinCtrlAssembly/LinCtrlAssembly.csproj" Id="33ef49f6-30b7-4c2c-98f6-602914eb00eb" />
   <Project Path="Sudzekai.LinCtrl.Hosting/Sudzekai.LinCtrl.Hosting.csproj" Id="7a4d929f-dffa-4f40-a592-b9b1db159251" />
+  <Project Path="Sudzekai.LinCtrl.Assembly.Generator/Sudzekai.LinCtrl.Assembly.Generator.csproj" />
   <Project Path="Sudzekai.LinCtrl.Assembly/Sudzekai.LinCtrl.Assembly.csproj" Id="9f13983b-ecdf-4110-8a8f-7a163a95c187" />
   <Project Path="Sudzekai.LinCtrl.Core/Sudzekai.LinCtrl.Core.csproj" />
   <Project Path="TEST.Sudzekai.LinCtrl.Core/TEST.Sudzekai.LinCtrl.Core.csproj" Id="25a5a284-13ca-43d4-be93-a38ca604b542" />
