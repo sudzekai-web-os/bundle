@@ -5,8 +5,11 @@ namespace Sudzekai.LinCtrl.Hosting
     internal class AssemblyLifetimeHost(
         IEnumerable<IAssemblyLoader> loaders,
         IEnumerable<IAssemblyInitializer> initializers,
-        ILogger<AssemblyLifetimeHost> logger)
+        ILogger<AssemblyLifetimeHost> logger,
+        RequestHandlerLifetimeHost handlers) : IDisposable
     {
+        private readonly HashSet<AssemblyInfo> _assemblies = [];
+
         public AssemblyInfo Load(string fullPath)
         {
             AssemblyInfo assembly = new(fullPath);
@@ -21,8 +24,18 @@ namespace Sudzekai.LinCtrl.Hosting
             if (!File.Exists(fullPath))
                 throw new FileNotFoundException($"[{tag}] Assembly path not found");
 
-            foreach (var loader in loaders)
-                loader.Load(assembly);
+            try
+            {
+                foreach (var loader in loaders)
+                    loader.Load(assembly);
+            }
+            catch
+            {
+                DisposeAfterFailure(assembly);
+                throw;
+            }
+
+            _assemblies.Add(assembly);
 
             assembly.SetLoaded();
 
@@ -49,12 +62,76 @@ namespace Sudzekai.LinCtrl.Hosting
                     throw new InvalidOperationException($"[{tag}] Assembly must not be disposed for initialization");
             }
 
-            foreach (var initializer in initializers)
-                initializer.Initialize(assembly);
+            try
+            {
+                foreach (var initializer in initializers)
+                    initializer.Initialize(assembly);
+            }
+            catch
+            {
+                DisposeAfterFailure(assembly);
+                throw;
+            }
 
             logger.LogInformation("[{tag}] Assembly initialized", tag);
 
             assembly.SetInitialized();
+        }
+
+        private void DisposeAfterFailure(AssemblyInfo assembly)
+        {
+            try
+            {
+                Dispose(assembly);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("Exception while releasing assembly resources: {message}", ex.Message);
+            }
+        }
+
+        public void Dispose(AssemblyInfo assembly)
+        {
+            if (assembly.Lifetime == AssemblyLifetime.Disposed)
+                return;
+
+            try
+            {
+                if (assembly.Lifetime != AssemblyLifetime.Created)
+                    handlers.Remove(assembly.Handlers);
+            }
+            finally
+            {
+                try
+                {
+                    if (assembly.HasVTable)
+                        assembly.VTable.AssemblyDisposeDelegate();
+                }
+                finally
+                {
+                    assembly.SetDisposed();
+                    _assemblies.Remove(assembly);
+                }
+            }
+        }
+
+        public void Dispose()
+        {
+            List<Exception> exceptions = [];
+            foreach (var assembly in _assemblies.ToArray())
+            {
+                try
+                {
+                    Dispose(assembly);
+                }
+                catch (Exception ex)
+                {
+                    exceptions.Add(ex);
+                }
+            }
+
+            if (exceptions.Count > 0)
+                throw new AggregateException("Failed to release assembly resources", exceptions);
         }
     }
 }

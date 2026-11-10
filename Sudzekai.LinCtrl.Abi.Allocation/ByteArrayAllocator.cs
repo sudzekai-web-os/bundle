@@ -8,7 +8,7 @@ namespace Sudzekai.LinCtrl.Abi.Allocation
         {
             ArgumentNullException.ThrowIfNull(source, nameof(source));
 
-            var dest = (byte*)Marshal.AllocCoTaskMem(source.Length);
+            var dest = (byte*)Marshal.AllocCoTaskMem(Math.Max(1, source.Length));
 
             try
             {

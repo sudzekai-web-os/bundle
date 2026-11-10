@@ -16,7 +16,7 @@ namespace Sudzekai.LinCtrl.Abi.Allocation
             try
             {
                 fixed (StringToStringArrayDescriptor* src = source)
-                    Buffer.MemoryCopy(src, dest, source.Length, source.Length);
+                    Buffer.MemoryCopy(src, dest, size, size);
             }
             catch
             {
@@ -36,9 +36,20 @@ namespace Sudzekai.LinCtrl.Abi.Allocation
             try
             {
                 foreach (var item in source)
-                    tmp.Add(new(
-                        StringAllocator.Alloc(item.Key),
-                        StringArrayAllocator.Alloc(item.Value)));
+                {
+                    StringToStringArrayDescriptor descriptor = default;
+                    try
+                    {
+                        descriptor.Key = StringAllocator.Alloc(item.Key);
+                        descriptor.Value = StringArrayAllocator.Alloc(item.Value);
+                        tmp.Add(descriptor);
+                    }
+                    catch
+                    {
+                        StringToStringArrayAllocator.Free(ref descriptor);
+                        throw;
+                    }
+                }
 
                 return Alloc(CollectionsMarshal.AsSpan(tmp));
             }

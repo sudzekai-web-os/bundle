@@ -1,106 +1,138 @@
-﻿using Sudzekai.LinCtrl.Core;
+﻿using Sudzekai.LinCtrl.Assembly.Internals.Services.DataResolving;
+using Sudzekai.LinCtrl.Abi.Managed;
+using Sudzekai.LinCtrl.Core;
 using System.Net;
 
 namespace Sudzekai.LinCtrl.Assembly.Extensions
 {
     public static class HttpResponseExtensions
     {
-        extension (HttpResponse response)
+        extension (HttpResponseDto response)
         {
+            public static HttpResponseDto Create(HttpStatusCode statusCode)
+                => new() { StatusCode = statusCode };
+
+            public HttpResponseDto As(ResponseContentType contentType)
+            {
+                response.ContentType = contentType;
+                return response;
+            }
+
+            public HttpResponseDto WithData<T>(T data)
+            {
+                IHttpResponseDataResolver resolver = response.ContentType switch
+                {
+                    ResponseContentType.ApplicationJson => new ApplicationJsonDataResolver(),
+                    ResponseContentType.TextPlain => new TextPlainDataResolver(),
+                    ResponseContentType.TextHtml => new TextHtmlDataResolver(),
+                    ResponseContentType.TextCsv => new TextCsvDataResolver(),
+                    ResponseContentType.ApplicationOctetStream => new ApplicationOctetStreamDataResolver(),
+                    ResponseContentType.ApplicationFormUrlEncoded => new ApplicationFormUrlEncodedDataResolver(),
+                    ResponseContentType.ImagePng => new ImagePngDataResolver(),
+                    ResponseContentType.ImageJpeg => new ImageJpegDataResolver(),
+                    ResponseContentType.ImageWebp => new ImageWebpDataResolver(),
+                    ResponseContentType.ImageSvgXml => new ImageSvgXmlDataResolver(),
+                    ResponseContentType.ApplicationPdf => new ApplicationPdfDataResolver(),
+                    ResponseContentType.ApplicationZip => new ApplicationZipDataResolver(),
+                    _ => throw new NotSupportedException($"Unsupported response content type: {response.ContentType}")
+                };
+                return resolver.Resolve(response, data);
+            }
+
             // ApplicationJson 
 
-            public static HttpResponse CreateJson(HttpStatusCode statusCode, object data)
-                => HttpResponse.Create(statusCode).AsJson(data);
+            public static HttpResponseDto CreateJson(HttpStatusCode statusCode, object data)
+                => HttpResponseDto.Create(statusCode).AsJson(data);
             
-            public HttpResponse AsJson(object data)
+            public HttpResponseDto AsJson(object data)
                 => response.As(ResponseContentType.ApplicationJson).WithData(data);
 
             // TextPlain 
             
-            public static HttpResponse CreateText(HttpStatusCode statusCode, string data)
-                => HttpResponse.Create(statusCode).AsText(data);
+            public static HttpResponseDto CreateText(HttpStatusCode statusCode, string data)
+                => HttpResponseDto.Create(statusCode).AsText(data);
             
-            public HttpResponse AsText(string data)
+            public HttpResponseDto AsText(string data)
                 => response.As(ResponseContentType.TextPlain).WithData(data);
 
             // TextHtml 
             
-            public static HttpResponse CreateHtml(HttpStatusCode statusCode, string data)
-                => HttpResponse.Create(statusCode).AsHtml(data);
+            public static HttpResponseDto CreateHtml(HttpStatusCode statusCode, string data)
+                => HttpResponseDto.Create(statusCode).AsHtml(data);
 
-            public HttpResponse AsHtml(string data)
+            public HttpResponseDto AsHtml(string data)
                 => response.As(ResponseContentType.TextHtml).WithData(data);
 
             // TextCsv 
             
-            public static HttpResponse CreateCsv(HttpStatusCode statusCode, string data)
-                => HttpResponse.Create(statusCode).AsCsv(data);
+            public static HttpResponseDto CreateCsv(HttpStatusCode statusCode, string data)
+                => HttpResponseDto.Create(statusCode).AsCsv(data);
             
-            public HttpResponse AsCsv(string data)
+            public HttpResponseDto AsCsv(string data)
                 => response.As(ResponseContentType.TextCsv).WithData(data);
 
             // ApplicationOctetStream 
             
-            public static HttpResponse CreateOctetStream(HttpStatusCode statusCode, byte[] data)
-                => HttpResponse.Create(statusCode).AsOctetStream(data);
+            public static HttpResponseDto CreateOctetStream(HttpStatusCode statusCode, byte[] data)
+                => HttpResponseDto.Create(statusCode).AsOctetStream(data);
             
-            public HttpResponse AsOctetStream(byte[] data)
+            public HttpResponseDto AsOctetStream(byte[] data)
                 => response.As(ResponseContentType.ApplicationOctetStream).WithData(data);
 
             // ApplicationFormUrlEncoded 
             
-            public static HttpResponse CreateFormUrlEncoded(HttpStatusCode statusCode, string data)
-                => HttpResponse.Create(statusCode).AsFormUrlEncoded(data);
+            public static HttpResponseDto CreateFormUrlEncoded(HttpStatusCode statusCode, string data)
+                => HttpResponseDto.Create(statusCode).AsFormUrlEncoded(data);
             
-            public HttpResponse AsFormUrlEncoded(string data)
+            public HttpResponseDto AsFormUrlEncoded(string data)
                 => response.As(ResponseContentType.ApplicationFormUrlEncoded).WithData(data);
 
             // ImagePng 
             
-            public static HttpResponse CreatePng(HttpStatusCode statusCode, byte[] data)
-                => HttpResponse.Create(statusCode).AsPng(data);
+            public static HttpResponseDto CreatePng(HttpStatusCode statusCode, byte[] data)
+                => HttpResponseDto.Create(statusCode).AsPng(data);
             
-            public HttpResponse AsPng(byte[] data)
+            public HttpResponseDto AsPng(byte[] data)
                 => response.As(ResponseContentType.ImagePng).WithData(data);
 
             // ImageJpeg 
             
-            public static HttpResponse CreateJpeg(HttpStatusCode statusCode, byte[] data)
-                => HttpResponse.Create(statusCode).AsJpeg(data);
+            public static HttpResponseDto CreateJpeg(HttpStatusCode statusCode, byte[] data)
+                => HttpResponseDto.Create(statusCode).AsJpeg(data);
             
-            public HttpResponse AsJpeg(byte[] data)
+            public HttpResponseDto AsJpeg(byte[] data)
                 => response.As(ResponseContentType.ImageJpeg).WithData(data);
 
             // ImageWebp 
             
-            public static HttpResponse CreateWebp(HttpStatusCode statusCode, byte[] data)
-                => HttpResponse.Create(statusCode).AsWebp(data);
+            public static HttpResponseDto CreateWebp(HttpStatusCode statusCode, byte[] data)
+                => HttpResponseDto.Create(statusCode).AsWebp(data);
            
-            public HttpResponse AsWebp(byte[] data)
+            public HttpResponseDto AsWebp(byte[] data)
                 => response.As(ResponseContentType.ImageWebp).WithData(data);
 
             // ImageSvgXml 
             
-            public static HttpResponse CreateSvg(HttpStatusCode statusCode, string data)
-                => HttpResponse.Create(statusCode).AsSvg(data);
+            public static HttpResponseDto CreateSvg(HttpStatusCode statusCode, string data)
+                => HttpResponseDto.Create(statusCode).AsSvg(data);
             
-            public HttpResponse AsSvg(string data)
+            public HttpResponseDto AsSvg(string data)
                 => response.As(ResponseContentType.ImageSvgXml).WithData(data);
 
             // ApplicationPdf 
             
-            public static HttpResponse CreatePdf(HttpStatusCode statusCode, byte[] data)
-                => HttpResponse.Create(statusCode).AsPdf(data);
+            public static HttpResponseDto CreatePdf(HttpStatusCode statusCode, byte[] data)
+                => HttpResponseDto.Create(statusCode).AsPdf(data);
             
-            public HttpResponse AsPdf(byte[] data)
+            public HttpResponseDto AsPdf(byte[] data)
                 => response.As(ResponseContentType.ApplicationPdf).WithData(data);
 
             // ApplicationZip 
             
-            public static HttpResponse CreateZip(HttpStatusCode statusCode, byte[] data)
-                => HttpResponse.Create(statusCode).AsZip(data);
+            public static HttpResponseDto CreateZip(HttpStatusCode statusCode, byte[] data)
+                => HttpResponseDto.Create(statusCode).AsZip(data);
             
-            public HttpResponse AsZip(byte[] data)
+            public HttpResponseDto AsZip(byte[] data)
                 => response.As(ResponseContentType.ApplicationZip).WithData(data);
         }
     }

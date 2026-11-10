@@ -4,7 +4,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Sudzekai.LinCtrl.Hosting
 {
-    internal class RequestHandlerBuilderProvider(ILogger<RequestHandlerBuilderProvider> logger) : IRequestHandlerBuilder
+    internal class RequestHandlerBuilderProvider(
+        ILogger<RequestHandlerBuilderProvider> logger,
+        RequestHandlerEndpointDataSource dataSource) : IRequestHandlerBuilder
     {
         public virtual IEndpointRouteBuilder RouteBuilder
         {
@@ -19,15 +21,16 @@ namespace Sudzekai.LinCtrl.Hosting
 
             logger.LogDebug("[{tag}] Creating handler builder...", builder.GetTag());
 
-            builder.ConventionBuilder = RouteBuilder.MapMethods(
-                builder.Handler.Pattern,
-                [builder.Handler.HttpMethod.ToMethodString()],
-                () => { });
+            builder.ConventionBuilder = dataSource.Add(builder.Handler);
 
             logger.LogDebug("[{tag}] Handler builder created", builder.GetTag());
         }
 
         public virtual void SetRouteBuilder(IEndpointRouteBuilder builder)
-            => RouteBuilder = builder;
+        {
+            RouteBuilder = builder;
+            if (!builder.DataSources.Contains(dataSource))
+                builder.DataSources.Add(dataSource);
+        }
     }
 }

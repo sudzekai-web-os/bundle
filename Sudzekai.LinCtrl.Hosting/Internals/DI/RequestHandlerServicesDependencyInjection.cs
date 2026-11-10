@@ -20,6 +20,7 @@ namespace Sudzekai.LinCtrl.Hosting
 
             private IServiceCollection AddBuildServices()
             {
+                services.AddSingleton<RequestHandlerEndpointDataSource>();
                 services.AddSingleton<RequestHandlerBuilderProvider>();
                 services.AddSingleton<IRequestHandlerBuilder>(sp => sp.GetRequiredService<RequestHandlerBuilderProvider>());
                 services.AddSingleton<IRequestHandlerBuilder, RequestHandlerDelegateBuilder>();

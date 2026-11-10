@@ -1,26 +1,32 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Sudzekai.LinCtrl.Abi.Managed;
+using Microsoft.Extensions.Logging;
 using Sudzekai.LinCtrl.Core;
 
 namespace Sudzekai.LinCtrl.Assembly.Internals.Objects
 {
     internal class HttpRequestHandlerDecorator(
-        IHttpRequestHandler handler, 
-        ILogger logger) : IHttpRequestHandler
+        IRequestHandler handler,
+        ILogger logger) : IRequestHandler
     {
         public string Pattern => handler.Pattern;
 
         public HttpRequestMethod HttpMethod => handler.HttpMethod;
 
-        public async Task<HttpResponse> HandleAsync(HttpRequestDto request)
+        public HttpResponseDto Handle(HttpRequestDto request)
         {
             try
             {
-                return await handler.HandleAsync(request);
+                return handler.Handle(request);
             }
             catch (Exception ex)
             {
                 logger.LogError("[{method}:{path}] Exception occured while handling http request: {message}", HttpMethod.ToString().ToLower(), Pattern, ex.Message);
-                return HttpResponse.Create(System.Net.HttpStatusCode.InternalServerError).As(ResponseContentType.ApplicationJson).WithData("Internal server error");
+                return new()
+                {
+                    StatusCode = System.Net.HttpStatusCode.InternalServerError,
+                    ContentType = ResponseContentType.TextPlain,
+                    Data = "Internal server error"u8.ToArray()
+                };
             }
         }
     }

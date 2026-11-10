@@ -1,4 +1,5 @@
-﻿using LinCtrlAssembly.Context;
+﻿using Sudzekai.LinCtrl.Abi.Managed;
+using LinCtrlAssembly.Context;
 using LinCtrlAssembly.Handlers;
 using Microsoft.Extensions.DependencyInjection;
 using Sudzekai.LinCtrl.Assembly;
@@ -13,8 +14,8 @@ namespace LinCtrlAssembly
         {
             LinCtrlContext.AddTypeInfoResolver(AssemblyJsonContext.Default);
 
-            builder.Services.AddScoped<IHttpRequestHandler, ResponseObjectRequestHandler>();
-            builder.Services.AddScoped<IHttpRequestHandler, UnregisteredResponseObjectHandler>();
+            builder.Services.AddScoped<IRequestHandler, ResponseObjectRequestHandler>();
+            builder.Services.AddScoped<IRequestHandler, UnregisteredResponseObjectHandler>();
         }
     }
 }

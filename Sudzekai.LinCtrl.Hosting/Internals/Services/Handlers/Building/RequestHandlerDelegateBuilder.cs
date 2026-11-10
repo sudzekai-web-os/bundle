@@ -26,7 +26,7 @@ namespace Sudzekai.LinCtrl.Hosting
             {
                 var request = await ctx.Request.ToRequestDto();
 
-                var response = await builder.Handler.HandleAsync(request);
+                var response = builder.Handler.Handle(request);
 
                 ctx.Response.StatusCode = (int)response.StatusCode;
 

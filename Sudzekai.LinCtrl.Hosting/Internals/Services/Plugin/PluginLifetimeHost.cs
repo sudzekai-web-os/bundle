@@ -6,7 +6,7 @@ namespace Sudzekai.LinCtrl.Hosting
         IEnumerable<IPluginLoader> loaders,
         IEnumerable<IPluginInitializer> initializers,
         IEnumerable<IPluginDisposer> disposers,
-        ILogger<PluginLifetimeHost> logger)
+        ILogger<PluginLifetimeHost> logger) : IDisposable
     {
         private HashSet<PluginInfo> _plugins = [];
 
@@ -23,8 +23,16 @@ namespace Sudzekai.LinCtrl.Hosting
 
             logger.LogInformation("[{tag}] Plugin loading started", tag);
 
-            foreach (var loader in loaders)
-                loader.Load(plugin);
+            try
+            {
+                foreach (var loader in loaders)
+                    loader.Load(plugin);
+            }
+            catch
+            {
+                DisposeAfterFailure(plugin);
+                throw;
+            }
 
             plugin.SetLoaded();
 
@@ -37,6 +45,8 @@ namespace Sudzekai.LinCtrl.Hosting
 
         public void Initialize(PluginInfo plugin)
         {
+            ObjectDisposedException.ThrowIf(plugin.Lifetime == PluginLifetime.Disposed, plugin);
+
             if (plugin.Lifetime == PluginLifetime.Initialized)
                 throw new InvalidOperationException($"Plugin already initialized");
 
@@ -47,8 +57,16 @@ namespace Sudzekai.LinCtrl.Hosting
 
             logger.LogInformation("[{tag}] Plugin initialization started", tag);
 
-            foreach (var initializer in initializers)
-                initializer.Initialize(plugin);
+            try
+            {
+                foreach (var initializer in initializers)
+                    initializer.Initialize(plugin);
+            }
+            catch
+            {
+                DisposeAfterFailure(plugin);
+                throw;
+            }
 
             plugin.SetInitialized();
 
@@ -60,23 +78,68 @@ namespace Sudzekai.LinCtrl.Hosting
         public void Dispose(PluginInfo plugin)
         {
             if (plugin.Lifetime == PluginLifetime.Disposed)
-                throw new InvalidOperationException($"Plugin already disposed");
-
-            if (plugin.Lifetime < PluginLifetime.Loaded)
-                throw new InvalidOperationException($"Plugin must be loaded or initialized before disposing");
+                return;
 
             var tag = plugin.GetTag();
 
             logger.LogInformation("[{tag}] Plugin disposing started", tag);
 
-            foreach (var disposer in disposers)
-                disposer.Dispose(plugin);
-
-            plugin.SetDisposed();
+            List<Exception> exceptions = [];
+            try
+            {
+                foreach (var disposer in disposers)
+                {
+                    try
+                    {
+                        disposer.Dispose(plugin);
+                    }
+                    catch (Exception ex)
+                    {
+                        exceptions.Add(ex);
+                    }
+                }
+            }
+            finally
+            {
+                plugin.SetDisposed();
+                _plugins.Remove(plugin);
+            }
 
             logger.LogInformation("[{tag}] Plugin disposed", tag);
-            
-            _plugins.Remove(plugin);
+
+            if (exceptions.Count > 0)
+                throw new AggregateException("Failed to release plugin resources", exceptions);
+        }
+
+        private void DisposeAfterFailure(PluginInfo plugin)
+        {
+            try
+            {
+                Dispose(plugin);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("Exception while releasing plugin resources: {message}", ex.Message);
+            }
+        }
+
+        public void Dispose()
+        {
+            List<Exception> exceptions = [];
+            foreach (var plugin in _plugins.ToArray())
+            {
+                try
+                {
+                    Dispose(plugin);
+                }
+                catch (Exception ex)
+                {
+                    exceptions.Add(ex);
+                }
+            }
+
+            if (exceptions.Count > 0)
+                throw new AggregateException("Failed to release plugins", exceptions);
         }
 
         public IReadOnlyList<PluginInfo> GetPlugins()

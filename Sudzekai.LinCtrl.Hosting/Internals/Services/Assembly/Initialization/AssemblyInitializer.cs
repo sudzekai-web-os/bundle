@@ -9,10 +9,10 @@ namespace Sudzekai.LinCtrl.Hosting
         {
             logger.LogDebug("[{tag}] Initializing assembly...", info.GetTag());
 
-            if (info.VTable.InitializeDelegate == null)
+            if (info.VTable.InitDelegate == null)
                 throw new InvalidOperationException("Assembly delegate for initialization was null");
 
-            info.VTable.InitializeDelegate();
+            info.VTable.InitDelegate();
 
             logger.LogDebug("[{tag}] Assembly initialized", info.GetTag());
         }

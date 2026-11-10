@@ -13,7 +13,21 @@ namespace Sudzekai.LinCtrl.Core
             PropertyNameCaseInsensitive = true
         };
 
+        private static readonly object _sync = new();
+
         public static void AddTypeInfoResolver(IJsonTypeInfoResolver resolver)
-            => JsonSerializerOptions.TypeInfoResolverChain.Add(resolver);
+        {
+            ArgumentNullException.ThrowIfNull(resolver);
+            lock (_sync)
+            {
+                if (JsonSerializerOptions.TypeInfoResolverChain.Contains(resolver))
+                    return;
+
+                if (JsonSerializerOptions.IsReadOnly)
+                    JsonSerializerOptions = new(JsonSerializerOptions);
+
+                JsonSerializerOptions.TypeInfoResolverChain.Add(resolver);
+            }
+        }
     } 
 }

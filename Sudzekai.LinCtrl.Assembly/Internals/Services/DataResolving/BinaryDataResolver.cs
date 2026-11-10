@@ -1,5 +1,5 @@
-﻿
-using Sudzekai.LinCtrl.Abi.Managed;
+﻿using Sudzekai.LinCtrl.Abi.Managed;
+
 using Sudzekai.LinCtrl.Core;
 
 namespace Sudzekai.LinCtrl.Assembly.Internals.Services.DataResolving

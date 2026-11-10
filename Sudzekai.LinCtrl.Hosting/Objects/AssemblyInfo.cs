@@ -1,4 +1,6 @@
-﻿using Sudzekai.LinCtrl.Core;
+﻿using Sudzekai.LinCtrl.Abi;
+using Sudzekai.LinCtrl.Abi.Managed;
+using Sudzekai.LinCtrl.Core;
 
 namespace Sudzekai.LinCtrl.Hosting
 {
@@ -23,19 +25,9 @@ namespace Sudzekai.LinCtrl.Hosting
             internal set;
         }
 
-        internal unsafe AssemblyVTableDescriptor* VTableDescriptorPointer
-        {
-            get
-            {
-                ThrowIfDisposed();
+        internal bool HasVTable => _vTable != null;
 
-                if (field == null)
-                    throw new InvalidOperationException("VTableDescriptorPointer was null");
-                
-                return field;
-            }
-            set;
-        }
+        private AssemblyVTable? _vTable;
 
         internal AssemblyVTable VTable
         {
@@ -43,22 +35,9 @@ namespace Sudzekai.LinCtrl.Hosting
             {
                 ThrowIfDisposed();
 
-                if (field == null)
-                    throw new InvalidOperationException("VTable was null");
-
-                return field;
+                return _vTable ?? throw new InvalidOperationException("VTable was null");
             }
-            set;
-        }
-
-        internal nint Handle
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return field;
-            }
-            set;
+            set => _vTable = value;
         }
 
         public PluginInfo PluginInfo
@@ -76,7 +55,7 @@ namespace Sudzekai.LinCtrl.Hosting
             internal set;
         }
 
-        public IReadOnlyList<IHttpRequestHandler> Handlers
+        public IReadOnlyList<IRequestHandler> Handlers
         {
             get
             {
@@ -94,7 +73,11 @@ namespace Sudzekai.LinCtrl.Hosting
             => Lifetime = AssemblyLifetime.Initialized;
 
         internal void SetDisposed()
-            => Lifetime = AssemblyLifetime.Disposed;
+        {
+            Handlers = [];
+            _vTable = null;
+            Lifetime = AssemblyLifetime.Disposed;
+        }
 
         private void ThrowIfDisposed()
             => ObjectDisposedException.ThrowIf(Lifetime == AssemblyLifetime.Disposed, this);

@@ -54,10 +54,10 @@ namespace Sudzekai.LinCtrl.Abi.Allocation
             int contentType,
             byte[] body)
         {
-            ArgumentNullException.ThrowIfNullOrWhiteSpace(host);
-            ArgumentNullException.ThrowIfNullOrWhiteSpace(scheme);
-            ArgumentNullException.ThrowIfNullOrWhiteSpace(path);
-            ArgumentNullException.ThrowIfNullOrWhiteSpace(queryString);
+            ArgumentNullException.ThrowIfNull(host);
+            ArgumentNullException.ThrowIfNull(scheme);
+            ArgumentNullException.ThrowIfNull(path);
+            ArgumentNullException.ThrowIfNull(queryString);
 
             StringViewer hostViewer = default;
             StringViewer schemeViewer = default;

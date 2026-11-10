@@ -14,6 +14,7 @@ namespace Sudzekai.LinCtrl.Hosting
 
                 services.AddSingleton<PluginLifetimeHost>();
                 services.AddSingleton<PluginsLifetimeHost>();
+                services.AddHostedService<PluginsLifetimeHostedService>();
 
                 return services;
             }
@@ -35,6 +36,7 @@ namespace Sudzekai.LinCtrl.Hosting
 
             private IServiceCollection AddDisposingServices()
             {
+                services.AddSingleton<IPluginDisposer, PluginAssembliesDisposer>();
                 return services;
             }
         }

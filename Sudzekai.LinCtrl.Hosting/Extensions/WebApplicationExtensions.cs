@@ -35,10 +35,8 @@ namespace Sudzekai.LinCtrl.Hosting
 
             public void UnloadPlugins()
             {
-                var pluginsLifetime = application.Services.GetRequiredService<PluginLifetimeHost>();
-
-                foreach (var plugin in pluginsLifetime.GetPlugins())
-                    pluginsLifetime.Dispose(plugin);
+                var pluginsLifetime = application.Services.GetRequiredService<PluginsLifetimeHost>();
+                pluginsLifetime.Dispose(pluginsLifetime.GetPlugins());
             }
         }
     }

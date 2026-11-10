@@ -9,4 +9,5 @@
   <Project Path="Sudzekai.LinCtrl.Core/Sudzekai.LinCtrl.Core.csproj" />
   <Project Path="Sudzekai.LinCtrl.Hosting/Sudzekai.LinCtrl.Hosting.csproj" Id="7a4d929f-dffa-4f40-a592-b9b1db159251" />
   <Project Path="TEST.Sudzekai.LinCtrl.Core/TEST.Sudzekai.LinCtrl.Core.csproj" Id="25a5a284-13ca-43d4-be93-a38ca604b542" />
+  <Project Path="Sudzekai.LinCtrl.Abi.Mapping/Sudzekai.LinCtrl.Abi.Mapping.csproj" />
 </Solution>

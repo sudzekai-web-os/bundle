@@ -165,6 +165,9 @@ node_modules/
 
 # Git Extensions
 *.Git*
+!/.github/
+!/.github/workflows/
+!/.github/workflows/publish.yml
 *.gitkeep
 
 # Sonar

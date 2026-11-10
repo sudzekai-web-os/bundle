@@ -88,22 +88,33 @@ public class AssemblyHostGenerator : IIncrementalGenerator
             private static global::Sudzekai.LinCtrl.Assembly.AssemblyHostBuilder _builder = default!;
             private static global::Sudzekai.LinCtrl.Assembly.AssemblyHost _host = default!;
 
-            public static {{m.TypeName}} Instance = new {{m.TypeName}}();
+            public static {{m.TypeName}} Instance = default!;
 
             [global::System.Runtime.InteropServices.UnmanagedCallersOnly(
-                EntryPoint = global::Sudzekai.LinCtrl.Core.AssemblyExports.ExchangeVTables)]
+                EntryPoint = global::Sudzekai.LinCtrl.Core.AssemblyExports.ExchangeVTables,
+                CallConvs = new[] { typeof(global::System.Runtime.CompilerServices.CallConvCdecl) })]
             public static unsafe int Exchange(
-                global::Sudzekai.LinCtrl.Core.HostVTableDescriptor* hostVTable, 
-                global::Sudzekai.LinCtrl.Core.AssemblyVTableDescriptor** assemblyVTable)
+                global::Sudzekai.LinCtrl.Abi.HostVTableDescriptor* hostVTable,
+                global::Sudzekai.LinCtrl.Abi.AssemblyVTableDescriptor** assemblyVTable)
             {
+                if (assemblyVTable == null)
+                    return 1;
+
+                *assemblyVTable = null;
+
+                if (_ctx != null && !_ctx.IsDisposed)
+                    return 1;
+
                 try
                 {
                     _ctx = new(hostVTable)
                     {
-                        InitializeDelegate = Init,
+                        InitDelegate = Init,
                         DelegateLoggingDelegate = DelegateLogging,
                         BuildDelegate = Build,
-                        GetHttpRequestHandlersDelegate = GetHandlers
+                        GetRequestHandlersDelegate = GetHandlers,
+                        GetRequestHandlersMetadataDelegate = () => _host.GetHandlersMetadata(),
+                        AssemblyDisposeDelegate = Dispose
                     };
 
                     *assemblyVTable = _ctx.GetVtbl();
@@ -112,35 +123,50 @@ public class AssemblyHostGenerator : IIncrementalGenerator
                 }
                 catch
                 {
+                    _ctx = default!;
                     return 1;
                 }
             }
 
-            private static int Init() 
+            private static void Dispose()
             {
-                try 
+                try
                 {
-                    _builder = global::Sudzekai.LinCtrl.Assembly.AssemblyHost.CreateBuilder(_ctx);
-                    Instance.Configure(_builder);
-                    return 0;
+                    _host?.Dispose();
                 }
-                catch 
+                finally
                 {
-                    return 1;
+                    try
+                    {
+                        if ((object?)Instance is global::System.IDisposable disposable)
+                            disposable.Dispose();
+                    }
+                    finally
+                    {
+                        Instance = default!;
+                        _host = default!;
+                        _builder = default!;
+                    }
                 }
             }
 
-            private static int DelegateLogging(global::Sudzekai.LinCtrl.Core.LogDelegate del)
+            private static void Init()
+            {
+                if (_builder != null)
+                    throw new global::System.InvalidOperationException("Assembly already initialized");
+
+                Instance = new {{m.TypeName}}();
+                _builder = global::Sudzekai.LinCtrl.Assembly.AssemblyHost.CreateBuilder(_ctx);
+                Instance.Configure(_builder);
+            }
+
+            private static void DelegateLogging(global::Sudzekai.LinCtrl.Abi.Managed.Types.Delegates.LogDelegate del)
                 => _builder.DelegateLogging(del);
 
-            private static int Build()
-            {
-                _host = _builder.Build();
+            private static void Build()
+                => _host = _builder.Build();
 
-                return 0;
-            }
-
-            private static global::Sudzekai.LinCtrl.Core.IHttpRequestHandler[] GetHandlers()
+            private static global::Sudzekai.LinCtrl.Abi.Managed.IRequestHandler[] GetHandlers()
                 => _host.GetHandlers();
         }
         """;

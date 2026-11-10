@@ -15,6 +15,7 @@ namespace Sudzekai.LinCtrl.Hosting
                 return;
 
             List<AssemblyInfo> assemblies = [];
+            info.Assemblies = assemblies;
 
             foreach (var assemblyPath in info.Manifest.Assemblies)
             {

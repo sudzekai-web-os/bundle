@@ -27,7 +27,7 @@ namespace Sudzekai.LinCtrl.Abi.Allocation
             {
                 dataViewer = ByteArrayAllocator.Alloc(data);
 
-                return Alloc(contentType, statusCode, data);
+                return Alloc(contentType, statusCode, dataViewer);
             }
             catch
             {

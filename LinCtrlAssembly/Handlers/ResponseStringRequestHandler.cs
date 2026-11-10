@@ -1,16 +1,18 @@
-﻿using Sudzekai.LinCtrl.Core;
+﻿using Sudzekai.LinCtrl.Assembly.Extensions;
+using Sudzekai.LinCtrl.Abi.Managed;
+using Sudzekai.LinCtrl.Core;
 
 namespace LinCtrlAssembly.Handlers
 {
-    internal class ResponseStringRequestHandler : IHttpRequestHandler
+    internal class ResponseStringRequestHandler : IRequestHandler
     {
         public string Pattern => "string";
 
         public HttpRequestMethod HttpMethod => HttpRequestMethod.Get;
 
-        public Task<HttpResponse> HandleAsync(HttpRequestDto request)
+        public HttpResponseDto Handle(HttpRequestDto request)
         {
-            return Task.FromResult(HttpResponse.Create(System.Net.HttpStatusCode.OK).As(ResponseContentType.ApplicationJson).WithData("string"));
+            return HttpResponseDto.Create(System.Net.HttpStatusCode.OK).As(ResponseContentType.ApplicationJson).WithData("string");
         }
     }
 }

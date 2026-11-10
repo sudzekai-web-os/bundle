@@ -1,186 +1,53 @@
-﻿using Sudzekai.LinCtrl.Core;
+﻿using Sudzekai.LinCtrl.Abi;
+using Sudzekai.LinCtrl.Abi.Allocation;
+using Sudzekai.LinCtrl.Abi.Managed;
+using Sudzekai.LinCtrl.Abi.Managed.Types.Delegates;
+using Sudzekai.LinCtrl.Abi.Mapping;
+using Sudzekai.LinCtrl.Core;
 
 namespace Sudzekai.LinCtrl.Assembly.Context
 {
     public class AssemblyContext
     {
+        private AssemblyVTableRegistration? _registration;
+
+        public bool IsDisposed => _registration?.IsDisposed ?? false;
+
         public unsafe AssemblyContext(HostVTableDescriptor* hostVTableDescriptorPointer)
         {
-            
+            if (hostVTableDescriptorPointer == null || hostVTableDescriptorPointer->AbiVersion != LinCtrlContext.AbiVersion)
+                throw new InvalidOperationException("Host ABI version is not supported");
         }
 
-        public const uint AbiVersion = 1;
+        public InitDelegate InitDelegate { get; init; } = () => { };
 
-        /// <summary>
-        /// Делегат функции вызывающейся первой в очереди
-        /// </summary>
-        public InitializeDelegate? InitializeDelegate
-        {
-            get;
-            init
-            {
-                field = () =>
-                {
-                    if (value == null)
-                    {
-                        return 1;
-                    }
+        public DelegateLoggingDelegate DelegateLoggingDelegate { get; init; } = _ => { };
 
-                    try
-                    {
-                        return value();
-                    }
-                    catch
-                    {
-                        return 2;
-                    }
-                };
-            }
-        }
+        public BuildDelegate BuildDelegate { get; init; } = () => { };
 
-        /// <summary>
-        /// Делегат функции вызывающейся второй в очереди
-        /// </summary>
-        public DelegateLoggingDelegate? DelegateLoggingDelegate
-        {
-            get; init
-            {
-                field = (del) =>
-                {
-                    if (value == null)
-                    {
-                        return 1;
-                    }
+        public GetRequestHandlersDelegate GetRequestHandlersDelegate { get; init; } = () => [];
 
-                    try
-                    {
-                        return value(del);
-                    }
-                    catch
-                    {
-                        return 2;
-                    }
-                };
-            }
-        }
+        public GetRequestHandlersMetadataDelegate GetRequestHandlersMetadataDelegate { get; init; } = () => string.Empty;
 
-        /// <summary>
-        /// Делегат функции вызывающейся третьей в очереди
-        /// </summary>
-        public BuildDelegate? BuildDelegate
-        {
-            get;
-            init
-            {
-                field = () =>
-                {
-                    if (value == null)
-                    {
-                        return 1;
-                    }
-
-                    try
-                    {
-                        return value();
-                    }
-                    catch
-                    {
-                        return 2;
-                    }
-                };
-            }
-        }
-
-        /// <summary>
-        /// Делегат функции вызывающейся четвёртой в очереди
-        /// </summary>
-        public GetHttpRequestHandlersDelegate? GetHttpRequestHandlersDelegate
-        {
-            get;
-            init
-            {
-                field = () =>
-                {
-                    if (value == null)
-                    {
-                        return [];
-                    }
-
-                    try
-                    {
-                        return value();
-                    }
-                    catch
-                    {
-                        return [];
-                    }
-                };
-            }
-        }
-
-        /// <summary>
-        /// Делегат функции вызывающейся пятой в очереди
-        /// </summary>
-        public GetHttpRequestHandlersMetadataDelegate? GetHttpRequestHandlersMetadataDelegate
-        {
-            get;
-            init
-            {
-                field = () =>
-                {
-                    if (value == null)
-                    {
-                        return string.Empty;
-                    }
-
-                    try
-                    {
-                        return value();
-                    }
-                    catch
-                    {
-                        return string.Empty;
-                    }
-                };
-            }
-        }
+        public AssemblyDisposeDelegate AssemblyDisposeDelegate { get; init; } = () => { };
 
         public unsafe AssemblyVTableDescriptor* GetVtbl()
         {
-            var vTable = new AssemblyVTable(AbiVersion)
+            if (_registration != null)
+                throw new InvalidOperationException("Assembly virtual table already created");
+
+            _registration = new(new AssemblyVTable
             {
-                InitializeDelegate = InitializeDelegate,
-                DelegateLoggingDelegate = DelegateLoggingDelegate ?? ((d) => { return -1; }),
+                AbiVersion = (int)LinCtrlContext.AbiVersion,
+                InitDelegate = InitDelegate,
+                DelegateLoggingDelegate = DelegateLoggingDelegate,
                 BuildDelegate = BuildDelegate,
-                GetHttpRequestHandlersDelegate = GetHttpRequestHandlersDelegate,
-                GetHttpRequestHandlersMetadataDelegate = GetHttpRequestHandlersMetadataDelegate ?? (() => { return "EMPTY"; }),
+                GetRequestHandlersDelegate = GetRequestHandlersDelegate,
+                GetRequestHandlersMetadataDelegate = GetRequestHandlersMetadataDelegate,
+                AssemblyDisposeDelegate = AssemblyDisposeDelegate
+            });
 
-                FreeAssemblyVTableDelegate = _freeAssemblyVTableDelegate,
-                AssemblyDisposeDelegate = _assemblyDisposeDelegate
-            };
-
-            return AllocationUtilities.AllocCoTaskMem(AssemblyVTableDescriptor.Alloc(vTable));
+            return CoTaskAllocator.Alloc(_registration.ToDescriptor());
         }
-
-        private readonly unsafe FreeAssemblyVTableDelegate _freeAssemblyVTableDelegate = (desc) =>
-        {
-            if (desc == null)
-                return 1;
-
-            try
-            {
-                AllocationUtilities.FreeCoTaskMemIfNotNull(ref desc);
-                return 0;
-            }
-            catch
-            {
-                return 2;
-            }
-        };
-
-        private readonly unsafe AssemblyDisposeDelegate _assemblyDisposeDelegate = () =>
-        {
-            return 0;
-        };
     }
 }

@@ -16,6 +16,7 @@ namespace Sudzekai.LinCtrl.Hosting
 
             foreach (var assembly in pluginInfo.Assemblies)
             {
+                var assemblyPath = assembly.FullPath;
                 try
                 {
                     assemblyHost.Initialize(assembly);
@@ -23,7 +24,7 @@ namespace Sudzekai.LinCtrl.Hosting
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError("[{tag}] Exception while initializing assembly: {message}. Assembly skipped", assembly.GetTag(), ex.Message);
+                    logger.LogError("[{tag}] Exception while initializing assembly: {message}. Assembly skipped", Path.GetFileName(assemblyPath), ex.Message);
                 }
             }
 

@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using Sudzekai.LinCtrl.Abi;
+using Sudzekai.LinCtrl.Abi.Allocation;
 using Sudzekai.LinCtrl.Core;
 using System.Runtime.InteropServices;
+using Sudzekai.LinCtrl.Abi.Mapping;
 
 namespace Sudzekai.LinCtrl.Hosting
 {
@@ -14,31 +16,29 @@ namespace Sudzekai.LinCtrl.Hosting
 
             logger.LogDebug("[{tag}] Exchanging virtual tables...", tag);
 
-            nint handle;
-
-            handle = NativeLibrary.Load(info.FullPath);
-
-            info.Handle = handle;
+            var handle = NativeLibraryCache.Load(info.FullPath);
 
             if (!NativeLibrary.TryGetExport(handle, AssemblyExports.ExchangeVTables, out var getVTableAddress))
                 throw new InvalidOperationException($"Assembly not exports \"{AssemblyExports.ExchangeVTables}\"");
 
             var func = (delegate* unmanaged[Cdecl]<HostVTableDescriptor*, AssemblyVTableDescriptor**, int>)getVTableAddress;
-
+            var hostVTable = HostVTableAllocator.Alloc(LinCtrlContext.AbiVersion);
             AssemblyVTableDescriptor* assemblyVTablePtr = null;
 
-            var result = func(HostingContext.VTableDescriptorPointer, &assemblyVTablePtr);
+            try
+            {
+                var result = func(&hostVTable, &assemblyVTablePtr);
+                if (result != 0)
+                    throw new InvalidOperationException($"Assembly export returned error result code: {result}");
+                if (assemblyVTablePtr == null)
+                    throw new InvalidOperationException("Assembly export returned null virtual table pointer");
 
-            if (result != 0)
-                throw new InvalidOperationException($"Assembly export \"{AssemblyExports.ExchangeVTables}\" returned error result code: {result}");
-            
-            if (assemblyVTablePtr == null)
-                throw new InvalidOperationException($"Assembly export \"{AssemblyExports.ExchangeVTables}\" returned null virtual table pointer");
-
-            var vTable = assemblyVTablePtr->ToManaged();
-
-            info.VTable = vTable;
-            info.VTableDescriptorPointer = assemblyVTablePtr;
+                info.VTable = AssemblyVTableMapper.ToManaged(*assemblyVTablePtr);
+            }
+            finally
+            {
+                CoTaskAllocator.Free(ref assemblyVTablePtr);
+            }
 
             logger.LogDebug("[{tag}] Virtual tables exchanged", tag);
         }

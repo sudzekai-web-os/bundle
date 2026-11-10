@@ -1,14 +1,40 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Sudzekai.LinCtrl.Abi.Allocation\Sudzekai.LinCtrl.Abi.Allocation.csproj" />
     <ProjectReference Include="..\Sudzekai.LinCtrl.Abi.Managed\Sudzekai.LinCtrl.Abi.Managed.csproj" />
     <ProjectReference Include="..\Sudzekai.LinCtrl.Abi\Sudzekai.LinCtrl.Abi.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <PackageId>Sudzekai.LinCtrl.Abi.Mapping</PackageId>
+    <Version>0.1.0</Version>
+    <Title>Sudzekai LinCtrl ABI Mapping</Title>
+    <Description>Marshalling between managed models and native ABI descriptors, including plugin callbacks and lifetime coordination.</Description>
+    <Authors>Sudzekai</Authors>
+    <Company>Sudzekai</Company>
+    <Product>Sudzekai LinCtrl</Product>
+    <Copyright>Copyright (c) Sudzekai</Copyright>
+    <PackageTags>sudzekai;linctrl;plugins;nativeaot;abi;marshalling;interop</PackageTags>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageProjectUrl>https://github.com/sudzekai-web-os/bundle</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/sudzekai-web-os/bundle</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="README.md" Pack="true" PackagePath="/" />
   </ItemGroup>
 
 </Project>

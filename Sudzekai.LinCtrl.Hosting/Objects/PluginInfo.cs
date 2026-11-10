@@ -44,20 +44,24 @@ namespace Sudzekai.LinCtrl.Hosting
             }
         }
 
+        private IReadOnlyList<AssemblyInfo> _assemblies = [];
+
+        internal IReadOnlyList<AssemblyInfo> LoadedAssemblies => _assemblies;
+
         public IReadOnlyList<AssemblyInfo> Assemblies
         {
             get
             {
                 ThrowIfOnlyCreated();
                 ThrowIfDisposed();
-                return field;
+                return _assemblies;
             }
             internal set
             {
                 ThrowIfDisposed();
-                field = value;
+                _assemblies = value;
             }
-        } = [];
+        }
 
         internal void SetLoaded()
             => Lifetime = PluginLifetime.Loaded;
@@ -66,7 +70,10 @@ namespace Sudzekai.LinCtrl.Hosting
             => Lifetime = PluginLifetime.Initialized;
 
         internal void SetDisposed()
-            => Lifetime = PluginLifetime.Disposed;
+        {
+            _assemblies = [];
+            Lifetime = PluginLifetime.Disposed;
+        }
 
         private void ThrowIfDisposed()
             => ObjectDisposedException.ThrowIf(Lifetime == PluginLifetime.Disposed, this);

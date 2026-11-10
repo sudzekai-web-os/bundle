@@ -51,8 +51,21 @@ namespace Sudzekai.LinCtrl.Hosting
         {
             logger.LogInformation("Starting plugins disposing...");
 
-            foreach (var plugin in plugins)
-                host.Dispose(plugin);
+            List<Exception> exceptions = [];
+            foreach (var plugin in plugins.ToArray())
+            {
+                try
+                {
+                    host.Dispose(plugin);
+                }
+                catch (Exception ex)
+                {
+                    exceptions.Add(ex);
+                }
+            }
+
+            if (exceptions.Count > 0)
+                throw new AggregateException("Failed to release plugins", exceptions);
 
             logger.LogInformation("Plugins disposed");
         }

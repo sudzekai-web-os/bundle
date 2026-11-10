@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Sudzekai.LinCtrl.Abi.Managed.Types.Delegates;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Sudzekai.LinCtrl.Assembly.Context;
 using Sudzekai.LinCtrl.Core;
@@ -7,38 +8,29 @@ namespace Sudzekai.LinCtrl.Assembly
 {
     public class AssemblyHostBuilder
     {
-        private readonly AssemblyContext _context;
         private readonly ServiceCollection _services = new();
+        private bool _built;
 
         internal AssemblyHostBuilder(AssemblyContext ctx)
         {
-            _context = ctx;
-
-
         }
 
         public IServiceCollection Services { get => _services; }
 
-        public int DelegateLogging(LogDelegate del)
+        public void DelegateLogging(LogDelegate del)
         {
-            try
-            {
-                ArgumentNullException.ThrowIfNull(del);
+            ArgumentNullException.ThrowIfNull(del);
 
-                Services.AddLogging(b => b.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace));
-
-                Services.AddSingleton<ILoggerProvider>(new DelegatedLoggerProvider(del));
-
-                return 0;
-            }
-            catch
-            {
-                return 1;
-            }
+            Services.AddLogging(b => b.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace));
+            Services.AddSingleton<ILoggerProvider>(new DelegatedLoggerProvider(del));
         }
 
         public AssemblyHost Build()
         {
+            if (_built)
+                throw new InvalidOperationException("Assembly host already built");
+
+            _built = true;
             _services.MakeReadOnly();
 
             return new(Services.BuildServiceProvider());

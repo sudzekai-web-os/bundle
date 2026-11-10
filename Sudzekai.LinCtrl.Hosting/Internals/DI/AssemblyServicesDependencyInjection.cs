@@ -32,7 +32,6 @@ namespace Sudzekai.LinCtrl.Hosting
                 services.AddSingleton<IAssemblyInitializer, AssemblyBuilder>();
                 services.AddSingleton<IAssemblyInitializer, AssemblyRequestHandlersLoader>();
                 services.AddSingleton<IAssemblyInitializer, AssemblyRequestHandlersConfigurator>();
-                services.AddSingleton<IAssemblyInitializer, AssemblyInitializationFinalizer>();
 
                 return services;
             }

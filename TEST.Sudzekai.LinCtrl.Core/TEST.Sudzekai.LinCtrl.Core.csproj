@@ -21,6 +21,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\Sudzekai.LinCtrl.Hosting\Sudzekai.LinCtrl.Hosting.csproj" />
+		<ProjectReference Include="..\LinCtrlAssembly\LinCtrlAssembly.csproj" />
+		<ProjectReference Include="..\Sudzekai.LinCtrl.Abi.Mapping\Sudzekai.LinCtrl.Abi.Mapping.csproj" />
 		<ProjectReference Include="..\Sudzekai.LinCtrl.Core\Sudzekai.LinCtrl.Core.csproj" />
 	</ItemGroup>
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Sudzekai.LinCtrl.Abi.Managed.Types.Delegates;
+using Microsoft.Extensions.Logging;
 using Sudzekai.LinCtrl.Assembly.Internals.Services.Logging;
 using Sudzekai.LinCtrl.Core;
 

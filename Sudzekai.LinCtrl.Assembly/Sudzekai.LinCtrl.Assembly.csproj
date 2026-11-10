@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Sudzekai.LinCtrl.Abi.Mapping\Sudzekai.LinCtrl.Abi.Mapping.csproj" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.14" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.14" />
   </ItemGroup>
@@ -18,7 +19,45 @@
     <ProjectReference Include="..\Sudzekai.LinCtrl.Abi.Managed\Sudzekai.LinCtrl.Abi.Managed.csproj" />
     <ProjectReference Include="..\Sudzekai.LinCtrl.Abi\Sudzekai.LinCtrl.Abi.csproj" />
     <ProjectReference Include="..\Sudzekai.LinCtrl.Core\Sudzekai.LinCtrl.Core.csproj" />
-    <ProjectReference Include="..\Sudzekai.LinCtrl.Assembly.Generator\Sudzekai.LinCtrl.Assembly.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\Sudzekai.LinCtrl.Assembly.Generator\Sudzekai.LinCtrl.Assembly.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="all" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <PackageId>Sudzekai.LinCtrl.Assembly</PackageId>
+    <Version>0.1.0</Version>
+    <Title>Sudzekai LinCtrl Plugin SDK</Title>
+    <Description>SDK for building Native AOT plugins with dependency injection, HTTP handlers, delegated logging, and generated ABI exports.</Description>
+    <Authors>Sudzekai</Authors>
+    <Company>Sudzekai</Company>
+    <Product>Sudzekai LinCtrl</Product>
+    <Copyright>Copyright (c) Sudzekai</Copyright>
+    <PackageTags>sudzekai;linctrl;plugins;nativeaot;sdk;dependency-injection;http</PackageTags>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageProjectUrl>https://github.com/sudzekai-web-os/bundle</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/sudzekai-web-os/bundle</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <Target Name="IncludeAssemblyGeneratorInPackage" BeforeTargets="_GetPackageFiles">
+    <MSBuild Projects="..\Sudzekai.LinCtrl.Assembly.Generator\Sudzekai.LinCtrl.Assembly.Generator.csproj"
+             Targets="GetTargetPath"
+             Properties="Configuration=$(Configuration);BuildProjectReferences=false">
+      <Output TaskParameter="TargetOutputs" ItemName="_AssemblyGeneratorPath" />
+    </MSBuild>
+    <ItemGroup>
+      <None Include="@(_AssemblyGeneratorPath)"
+            Pack="true"
+            PackagePath="analyzers/dotnet/cs"
+            Visible="false" />
+    </ItemGroup>
+  </Target>
 
 </Project>

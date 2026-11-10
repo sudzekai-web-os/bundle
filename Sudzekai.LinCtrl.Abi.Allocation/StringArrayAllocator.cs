@@ -16,7 +16,7 @@ namespace Sudzekai.LinCtrl.Abi.Allocation
             try
             {
                 fixed (StringViewer* src = source)
-                    Buffer.MemoryCopy(src, dest, source.Length, source.Length);
+                    Buffer.MemoryCopy(src, dest, size, size);
             }
             catch
             {
