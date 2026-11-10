@@ -1,0 +1,78 @@
+name: Publish NuGet
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish.yml'
+      - 'Sudzekai.LinCtrl.*/**'
+
+concurrency:
+  group: nuget-publish-main
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Build and publish Sudzekai.LinCtrl packages
+    runs-on: windows-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore bundle.slnx -m:1
+
+      - name: Build
+        run: dotnet build bundle.slnx -c Release --no-restore -m:1
+
+      - name: Test
+        run: dotnet ./TEST.Sudzekai.LinCtrl.Core/bin/Release/net10.0/TEST.Sudzekai.LinCtrl.Core.dll -noLogo
+
+      - name: Pack Sudzekai.LinCtrl packages
+        shell: pwsh
+        run: |
+          $projects = Get-ChildItem -Directory -Filter 'Sudzekai.LinCtrl.*' |
+            ForEach-Object { Join-Path $_.FullName "$($_.Name).csproj" } |
+            Sort-Object
+          if (-not $projects) { throw 'No Sudzekai.LinCtrl projects found' }
+
+          foreach ($project in $projects) {
+            if (-not (Test-Path -LiteralPath $project)) { throw "Project not found: $project" }
+            dotnet pack $project -c Release --no-build --no-restore -m:1 -o ./artifacts/nuget
+            if ($LASTEXITCODE -ne 0) { throw "Packing failed: $project" }
+          }
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-packages
+          path: artifacts/nuget/*.nupkg
+          if-no-files-found: error
+
+      - name: NuGet login
+        id: nuget-login
+        uses: NuGet/login@v1
+        with:
+          user: sudzekai
+
+      - name: Publish to NuGet
+        shell: pwsh
+        env:
+          NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
+        run: |
+          $packages = Get-ChildItem -Path ./artifacts/nuget -Filter '*.nupkg' -File
+          if (-not $packages) { throw 'No NuGet packages found' }
+
+          foreach ($package in $packages) {
+            dotnet nuget push $package.FullName --api-key $env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json --skip-duplicate
+            if ($LASTEXITCODE -ne 0) { throw "Publishing failed: $($package.Name)" }
+          }
