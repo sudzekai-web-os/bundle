@@ -5,7 +5,7 @@ namespace Sudzekai.LinCtrl.Core
 {
     public static class LinCtrlContext
     {
-        public const uint AbiVersion = 2;
+        public const uint AbiVersion = 3;
 
         public static JsonSerializerOptions JsonSerializerOptions { get; set; } = new()
         {

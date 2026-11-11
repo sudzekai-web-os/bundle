@@ -12,6 +12,8 @@ namespace Sudzekai.LinCtrl.Assembly.Internals.Objects
 
         public HttpRequestMethod HttpMethod => handler.HttpMethod;
 
+        public bool IsFiltering => handler.IsFiltering;
+
         public HttpResponseDto Handle(HttpRequestDto request)
         {
             try

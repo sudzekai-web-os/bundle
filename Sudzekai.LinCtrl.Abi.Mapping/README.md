@@ -3,7 +3,7 @@
 Marshalling between managed models and native ABI descriptors, including plugin callbacks and lifetime coordination.
 
 ```sh
-dotnet add package Sudzekai.LinCtrl.Abi.Mapping --version 0.2.0
+dotnet add package Sudzekai.LinCtrl.Abi.Mapping --version 0.3.0
 ```
 
 Requires .NET 10 for runtime libraries and a compatible .NET 10 SDK for plugin generation.

@@ -3,7 +3,7 @@
 Allocation and release of unmanaged buffers and descriptors used by the Sudzekai LinCtrl ABI.
 
 ```sh
-dotnet add package Sudzekai.LinCtrl.Abi.Allocation --version 0.2.0
+dotnet add package Sudzekai.LinCtrl.Abi.Allocation --version 0.3.0
 ```
 
 Requires .NET 10 for runtime libraries and a compatible .NET 10 SDK for plugin generation.

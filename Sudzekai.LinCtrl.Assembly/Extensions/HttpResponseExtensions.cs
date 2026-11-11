@@ -12,6 +12,15 @@ namespace Sudzekai.LinCtrl.Assembly.Extensions
             public static HttpResponseDto Create(HttpStatusCode statusCode)
                 => new() { StatusCode = statusCode };
 
+            public static HttpResponseDto CreateError(HttpStatusCode statusCode, int code, string message)
+            {
+                ArgumentOutOfRangeException.ThrowIfLessThan((int)statusCode, 400);
+                ArgumentOutOfRangeException.ThrowIfGreaterThan((int)statusCode, 599);
+                ArgumentNullException.ThrowIfNull(message);
+
+                return new() { StatusCode = statusCode, Error = new ResponseError(code, message) };
+            }
+
             public HttpResponseDto As(ResponseContentType contentType)
             {
                 response.ContentType = contentType;
@@ -20,6 +29,9 @@ namespace Sudzekai.LinCtrl.Assembly.Extensions
 
             public HttpResponseDto WithData<T>(T data)
             {
+                if (response.Error != null)
+                    throw new InvalidOperationException("A business error cannot contain response data");
+
                 IHttpResponseDataResolver resolver = response.ContentType switch
                 {
                     ResponseContentType.ApplicationJson => new ApplicationJsonDataResolver(),

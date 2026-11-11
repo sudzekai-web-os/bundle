@@ -12,6 +12,8 @@ namespace LinCtrlAssembly.Handlers
 
         public HttpRequestMethod HttpMethod => HttpRequestMethod.Get;
 
+        public bool IsFiltering => true;
+
         public HttpResponseDto Handle(HttpRequestDto request)
         {
             return HttpResponseDto.Create(HttpStatusCode.OK).As(ResponseContentType.ApplicationJson).WithData(new ResponseObject("OK", 200));

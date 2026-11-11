@@ -86,14 +86,7 @@ namespace Sudzekai.LinCtrl.Hosting
                 changes = _changes;
             }
 
-            try
-            {
-                changes.Cancel();
-            }
-            finally
-            {
-                changes.Dispose();
-            }
+            changes.Dispose();
         }
 
         private sealed class HandlerRegistration(

@@ -11,6 +11,8 @@ namespace Sudzekai.LinCtrl.Hosting
     [JsonSerializable(typeof(LoginCommand))]
     [JsonSerializable(typeof(LoginToken))]
     [JsonSerializable(typeof(PluginManifest))]
+    [JsonSerializable(typeof(SuccessResponseEnvelope))]
+    [JsonSerializable(typeof(ErrorResponseEnvelope))]
     internal partial class HostingContext : JsonSerializerContext
     {
     }

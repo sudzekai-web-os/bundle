@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Sudzekai.LinCtrl.Core;
 
 namespace Sudzekai.LinCtrl.Hosting
@@ -10,6 +11,8 @@ namespace Sudzekai.LinCtrl.Hosting
             public void AddLinCtrlInfrastructure()
             {
                 LinCtrlContext.AddTypeInfoResolver(HostingContext.Default);
+                builder.Services.ConfigureHttpJsonOptions(options =>
+                    options.SerializerOptions.TypeInfoResolverChain.Insert(0, HostingContext.Default));
                 builder.Services.AddAssemblyServices();
                 builder.Services.RegisterRequestHandlerServices();
                 builder.Services.AddPluginServices();

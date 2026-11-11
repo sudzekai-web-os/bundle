@@ -7,11 +7,12 @@ namespace Sudzekai.LinCtrl.Abi.Allocation
         public static unsafe RequestHandlerDescriptor Alloc(
             StringViewer pattern,
             int httpMethod,
-            delegate* unmanaged[Cdecl]<HttpRequestDtoDescriptor*, HttpResponseDtoDescriptor*, int> handleDelegate)
+            delegate* unmanaged[Cdecl]<HttpRequestDtoDescriptor*, HttpResponseDtoDescriptor*, int> handleDelegate,
+            int isFiltering = 0)
         {
             ArgumentNotAllocatedException.ThrowIfNotAllocated(pattern, nameof(pattern));
 
-            return new(pattern, httpMethod, handleDelegate);
+            return new(pattern, httpMethod, handleDelegate, isFiltering);
         }
 
         public static void Free(ref RequestHandlerDescriptor descriptor)

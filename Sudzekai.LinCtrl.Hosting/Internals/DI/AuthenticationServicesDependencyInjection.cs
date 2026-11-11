@@ -43,8 +43,6 @@ namespace Sudzekai.LinCtrl.Hosting
                     options.TokenValidationParameters = validation;
                 });
                 services.AddAuthorization();
-                services.ConfigureHttpJsonOptions(options =>
-                    options.SerializerOptions.TypeInfoResolverChain.Insert(0, HostingContext.Default));
                 services.AddRateLimiter(options =>
                 {
                     options.RejectionStatusCode = 429;

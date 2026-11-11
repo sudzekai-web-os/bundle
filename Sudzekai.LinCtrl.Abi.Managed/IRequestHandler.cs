@@ -8,6 +8,8 @@ namespace Sudzekai.LinCtrl.Abi.Managed
 
         public HttpRequestMethod HttpMethod { get; }
 
+        public bool IsFiltering => false;
+
         public HttpResponseDto Handle(HttpRequestDto request);
     }
 }

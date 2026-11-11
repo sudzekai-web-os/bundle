@@ -3,7 +3,7 @@
 Shared constants, HTTP enums, and JSON serialization configuration for Sudzekai LinCtrl.
 
 ```sh
-dotnet add package Sudzekai.LinCtrl.Core --version 0.2.0
+dotnet add package Sudzekai.LinCtrl.Core --version 0.3.0
 ```
 
 Requires .NET 10 for runtime libraries and a compatible .NET 10 SDK for plugin generation.

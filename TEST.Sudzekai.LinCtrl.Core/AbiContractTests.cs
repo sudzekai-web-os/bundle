@@ -126,7 +126,9 @@ namespace TEST.Sudzekai.LinCtrl.Core
                 var handlers = table.GetRequestHandlersDelegate();
                 var request = new HttpRequestDto { Host = "localhost", Scheme = "http", Path = "/object" };
 
-                var response = Assert.Single(handlers, h => h.Pattern == "object").Handle(request);
+                var handler = Assert.Single(handlers, h => h.Pattern == "object");
+                Assert.True(handler.IsFiltering);
+                var response = handler.Handle(request);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.Equal(ResponseContentType.ApplicationJson, response.ContentType);
                 using var json = System.Text.Json.JsonDocument.Parse(response.Data);

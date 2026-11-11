@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Sudzekai.LinCtrl.Abi.Managed;
 using Microsoft.Extensions.Logging;
 using System.Net;
 
@@ -15,7 +17,12 @@ namespace Sudzekai.LinCtrl.Hosting
             builder.ConventionBuilder.Add(c =>
             {
                 c.RequestDelegate = GetRequestDelegate(builder);
+                if (builder.Handler.IsFiltering)
+                    c.Metadata.Add(c.RequestDelegate.Method);
             });
+
+            if (builder.Handler.IsFiltering)
+                builder.ConventionBuilder.Finally(ResponseEnvelopeMetadata.Apply);
 
             logger.LogDebug("[{tag}] Delegate built", builder.GetTag());
         }
@@ -26,9 +33,25 @@ namespace Sudzekai.LinCtrl.Hosting
             {
                 var request = await ctx.Request.ToRequestDto();
 
-                var response = builder.Handler.Handle(request);
+                HttpResponseDto response;
+                try
+                {
+                    response = builder.Handler.Handle(request);
+                }
+                catch (Exception ex) when (builder.Handler.IsFiltering && ex is not OperationCanceledException)
+                {
+                    logger.LogError(ex, "[{tag}] Request handler failed", builder.GetTag());
+                    response = new HttpResponseDto { StatusCode = HttpStatusCode.InternalServerError };
+                }
 
                 ctx.Response.StatusCode = (int)response.StatusCode;
+
+                if (builder.Handler.IsFiltering)
+                {
+                    if (ResponseEnvelopeWriter.AllowsBody((int)response.StatusCode))
+                        await ResponseEnvelopeWriter.WriteAsync(ctx, response);
+                    return;
+                }
 
                 if (response.StatusCode == HttpStatusCode.NoContent ||
                     response.StatusCode == HttpStatusCode.NotModified ||
