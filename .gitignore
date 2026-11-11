@@ -260,3 +260,6 @@ ehthumbs_vista.db
 
 # Windows shortcuts
 *.lnk
+
+# Local database and JWT credentials
+/LinCtrlHost/local/

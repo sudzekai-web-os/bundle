@@ -14,7 +14,7 @@
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <PackageId>Sudzekai.LinCtrl.Abi.Allocation</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Title>Sudzekai LinCtrl ABI Allocation</Title>
     <Description>Allocation and release of unmanaged buffers and descriptors used by the Sudzekai LinCtrl ABI.</Description>
     <Authors>Sudzekai</Authors>

@@ -1,0 +1,26 @@
+CREATE DATABASE IF NOT EXISTS linctrl CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+USE linctrl;
+
+CREATE TABLE IF NOT EXISTS roles (
+    id INT NOT NULL PRIMARY KEY,
+    name VARCHAR(64) NOT NULL UNIQUE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS users (
+    id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(191) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+    role_id INT NOT NULL,
+    is_blocked BOOLEAN NOT NULL DEFAULT FALSE,
+    CONSTRAINT fk_users_role FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE RESTRICT
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS change_history (
+    id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    datetime DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    action VARCHAR(100) NOT NULL,
+    summary TEXT NOT NULL,
+    CONSTRAINT fk_change_history_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT,
+    INDEX ix_change_history_user_datetime (user_id, datetime)
+) ENGINE=InnoDB;

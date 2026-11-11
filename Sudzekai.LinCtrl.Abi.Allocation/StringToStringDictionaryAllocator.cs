@@ -28,8 +28,11 @@ namespace Sudzekai.LinCtrl.Abi.Allocation
         }
 
         public static StringToStringDictionaryDescriptor Alloc(IEnumerable<KeyValuePair<string, string>> source)
+            => AllocNullableValues(source.Select(entry => new KeyValuePair<string, string?>(entry.Key, entry.Value)));
+
+        internal static StringToStringDictionaryDescriptor AllocNullableValues(IEnumerable<KeyValuePair<string, string?>> source)
         {
-            ArgumentNullException.ThrowIfNull(source, nameof(source));
+            ArgumentNullException.ThrowIfNull(source);
 
             List<StringToStringDescriptor> tmp = [];
 
@@ -41,7 +44,7 @@ namespace Sudzekai.LinCtrl.Abi.Allocation
                     try
                     {
                         descriptor.Key = StringAllocator.Alloc(item.Key);
-                        descriptor.Value = StringAllocator.Alloc(item.Value);
+                        descriptor.Value = item.Value is null ? default : StringAllocator.Alloc(item.Value);
                         tmp.Add(descriptor);
                     }
                     catch

@@ -1,7 +1,9 @@
-﻿namespace Sudzekai.LinCtrl.Abi.Managed
+﻿using Sudzekai.LinCtrl.Core;
+
+namespace Sudzekai.LinCtrl.Abi.Managed
 {
     public class HostVTable
     {
-        public uint AbiVersion { get; set; } = 1;
+        public uint AbiVersion { get; set; } = LinCtrlContext.AbiVersion;
     }
 }
