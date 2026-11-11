@@ -33,7 +33,7 @@
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <PackageId>Sudzekai.LinCtrl.Hosting</PackageId>
-    <Version>0.2.0</Version>
+    <Version>0.2.1</Version>
     <Title>Sudzekai LinCtrl Hosting</Title>
     <Description>ASP.NET Core integration for loading Native AOT plugins, registering HTTP endpoints, and coordinating plugin startup and disposal.</Description>
     <Authors>Sudzekai</Authors>
