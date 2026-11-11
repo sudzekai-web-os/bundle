@@ -47,7 +47,14 @@ namespace TEST.Sudzekai.LinCtrl.Core
                 app.Urls.Add("http://127.0.0.1:0");
                 var lifetime = app.Services.GetRequiredService<RequestHandlerLifetimeHost>();
                 foreach (var handler in table.GetRequestHandlersDelegate())
-                    lifetime.Build(handler);
+                {
+                    var metadata = handler.Pattern == "/success"
+                        ? new RequestHandlerMetadata(handler.HttpMethod, handler.Pattern, "Успех", "Данные", [200],
+                            Group: "database",
+                            ResponseDataSchema: """{"type":"object","properties":{"value":{"type":"integer"}},"required":["value"]}""")
+                        : null;
+                    lifetime.Build(handler, metadata);
+                }
 
                 await app.StartAsync(cancellationToken);
                 using var client = new HttpClient { BaseAddress = new Uri(app.Urls.Single()) };
@@ -78,10 +85,13 @@ namespace TEST.Sudzekai.LinCtrl.Core
                 Assert.Equal(typeof(ErrorResponseEnvelope), Assert.Single(responses, type => type.StatusCode == 400).Type);
                 Assert.Equal(typeof(ErrorResponseEnvelope), Assert.Single(responses, type => type.StatusCode == 500).Type);
                 using var openApi = JsonDocument.Parse(await client.GetStringAsync("/openapi/v1.json", cancellationToken));
-                var documentedResponses = openApi.RootElement.GetProperty("paths").GetProperty("/success")
-                    .GetProperty("get").GetProperty("responses");
+                var operation = openApi.RootElement.GetProperty("paths").GetProperty("/success").GetProperty("get");
+                Assert.Equal("database", Assert.Single(operation.GetProperty("tags").EnumerateArray()).GetString());
+                var documentedResponses = operation.GetProperty("responses");
                 var successSchema = GetSchemaProperties(openApi.RootElement, documentedResponses, "200");
-                Assert.True(successSchema.TryGetProperty("data", out _));
+                var dataSchema = successSchema.GetProperty("data");
+                Assert.Equal("object", dataSchema.GetProperty("type").GetString());
+                Assert.Equal("integer", dataSchema.GetProperty("properties").GetProperty("value").GetProperty("type").GetString());
                 Assert.False(successSchema.TryGetProperty("error", out _));
                 var errorSchema = GetSchemaProperties(openApi.RootElement, documentedResponses, "400");
                 Assert.True(errorSchema.TryGetProperty("error", out _));

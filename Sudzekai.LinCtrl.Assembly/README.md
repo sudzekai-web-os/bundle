@@ -3,7 +3,7 @@
 SDK for building Native AOT plugins with dependency injection, HTTP handlers, delegated logging, and generated ABI exports.
 
 ```sh
-dotnet add package Sudzekai.LinCtrl.Assembly --version 0.3.0
+dotnet add package Sudzekai.LinCtrl.Assembly --version 0.4.0
 ```
 
 Requires .NET 10 for runtime libraries and a compatible .NET 10 SDK for plugin generation.

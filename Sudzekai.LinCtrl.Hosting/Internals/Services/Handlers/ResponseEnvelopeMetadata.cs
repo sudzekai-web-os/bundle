@@ -26,7 +26,7 @@ namespace Sudzekai.LinCtrl.Hosting
                 builder.Metadata.Add(Create(StatusCodes.Status500InternalServerError));
         }
 
-        private static ProducesResponseTypeMetadata Create(int statusCode)
+        public static ProducesResponseTypeMetadata Create(int statusCode)
         {
             if (!ResponseEnvelopeWriter.AllowsBody(statusCode))
                 return new ProducesResponseTypeMetadata(statusCode, typeof(void), []);

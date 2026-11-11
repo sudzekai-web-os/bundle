@@ -12,9 +12,9 @@ namespace Sudzekai.LinCtrl.Hosting
         public void Remove(IEnumerable<IRequestHandler> handlers)
             => dataSource.Remove(handlers);
 
-        public HttpRequestHandlerBuilder Build(IRequestHandler requestHandler)
+        public HttpRequestHandlerBuilder Build(IRequestHandler requestHandler, RequestHandlerMetadata? metadata = null)
         {
-            var builder = new HttpRequestHandlerBuilder(requestHandler);
+            var builder = new HttpRequestHandlerBuilder(requestHandler) { Metadata = metadata };
 
             logger.LogInformation("[{tag}] Handler building started", builder.GetTag());
 

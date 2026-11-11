@@ -14,6 +14,8 @@ namespace Sudzekai.LinCtrl.Hosting
 
         public IRequestHandler Handler { get; }
 
+        public RequestHandlerMetadata? Metadata { get; init; }
+
         public HttpRequestHandlerBuilder(IRequestHandler handler)
         {
             Handler = handler;

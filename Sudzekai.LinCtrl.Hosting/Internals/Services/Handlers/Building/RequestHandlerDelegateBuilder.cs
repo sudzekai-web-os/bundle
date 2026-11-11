@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Metadata;
 using Sudzekai.LinCtrl.Abi.Managed;
 using Microsoft.Extensions.Logging;
 using System.Net;
@@ -17,8 +18,20 @@ namespace Sudzekai.LinCtrl.Hosting
             builder.ConventionBuilder.Add(c =>
             {
                 c.RequestDelegate = GetRequestDelegate(builder);
-                if (builder.Handler.IsFiltering)
+                if (builder.Handler.IsFiltering || builder.Metadata != null)
                     c.Metadata.Add(c.RequestDelegate.Method);
+
+                if (builder.Metadata is { } metadata)
+                {
+                    c.Metadata.Add(metadata);
+                    c.Metadata.Add(new EndpointSummaryAttribute(metadata.Summary));
+                    c.Metadata.Add(new EndpointDescriptionAttribute(metadata.Description));
+                    if (!string.IsNullOrWhiteSpace(metadata.Group))
+                        c.Metadata.Add(new TagsAttribute(metadata.Group));
+                    if (builder.Handler.IsFiltering)
+                        foreach (var statusCode in metadata.ResponseStatusCodes)
+                            c.Metadata.Add(ResponseEnvelopeMetadata.Create(statusCode));
+                }
             });
 
             if (builder.Handler.IsFiltering)

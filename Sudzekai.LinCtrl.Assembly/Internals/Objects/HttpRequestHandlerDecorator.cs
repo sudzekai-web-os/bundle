@@ -14,6 +14,8 @@ namespace Sudzekai.LinCtrl.Assembly.Internals.Objects
 
         public bool IsFiltering => handler.IsFiltering;
 
+        public RequestHandlerMetadata? Metadata => handler.Metadata;
+
         public HttpResponseDto Handle(HttpRequestDto request)
         {
             try

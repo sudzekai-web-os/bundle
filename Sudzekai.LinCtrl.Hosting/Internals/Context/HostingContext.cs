@@ -8,6 +8,8 @@ using System.Text.Json.Serialization;
 namespace Sudzekai.LinCtrl.Hosting
 {
     [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase, PropertyNameCaseInsensitive = true)]
+    [JsonSerializable(typeof(int))]
+    [JsonSerializable(typeof(long))]
     [JsonSerializable(typeof(LoginCommand))]
     [JsonSerializable(typeof(LoginToken))]
     [JsonSerializable(typeof(PluginManifest))]

@@ -26,7 +26,7 @@
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <PackageId>Sudzekai.LinCtrl.Assembly</PackageId>
-    <Version>0.3.0</Version>
+    <Version>0.4.0</Version>
     <Title>Sudzekai LinCtrl Plugin SDK</Title>
     <Description>SDK for building Native AOT plugins with dependency injection, HTTP handlers, delegated logging, and generated ABI exports.</Description>
     <Authors>Sudzekai</Authors>

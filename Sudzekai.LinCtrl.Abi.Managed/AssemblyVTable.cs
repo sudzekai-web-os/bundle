@@ -21,7 +21,7 @@ namespace Sudzekai.LinCtrl.Abi.Managed
             => { throw new InvalidOperationException($"{nameof(GetRequestHandlersDelegate)} not configured"); };
         
         public GetRequestHandlersMetadataDelegate GetRequestHandlersMetadataDelegate { get; set; } = () 
-            => { throw new InvalidOperationException($"{nameof(GetRequestHandlersMetadataDelegate)} not configured"); };
+            => string.Empty;
         
         public AssemblyDisposeDelegate AssemblyDisposeDelegate { get; set; } = () 
             => { throw new InvalidOperationException($"{nameof(AssemblyDisposeDelegate)} not configured"); };

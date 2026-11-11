@@ -10,6 +10,8 @@ namespace Sudzekai.LinCtrl.Abi.Managed
 
         public bool IsFiltering => false;
 
+        public RequestHandlerMetadata? Metadata => null;
+
         public HttpResponseDto Handle(HttpRequestDto request);
     }
 }

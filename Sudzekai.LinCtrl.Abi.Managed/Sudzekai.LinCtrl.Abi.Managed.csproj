@@ -13,7 +13,7 @@
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <PackageId>Sudzekai.LinCtrl.Abi.Managed</PackageId>
-    <Version>0.3.0</Version>
+    <Version>0.4.0</Version>
     <Title>Sudzekai LinCtrl Managed ABI</Title>
     <Description>Managed request and response DTOs, plugin callbacks, and handler contracts for the Sudzekai LinCtrl ABI.</Description>
     <Authors>Sudzekai</Authors>
