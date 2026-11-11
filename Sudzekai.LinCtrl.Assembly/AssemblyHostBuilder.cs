@@ -1,4 +1,5 @@
 ﻿using Sudzekai.LinCtrl.Abi.Managed.Types.Delegates;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Sudzekai.LinCtrl.Assembly.Context;
@@ -13,7 +14,11 @@ namespace Sudzekai.LinCtrl.Assembly
 
         internal AssemblyHostBuilder(AssemblyContext ctx)
         {
+            Configuration = ctx.Configuration;
+            _services.AddSingleton(Configuration);
         }
+
+        public IConfiguration Configuration { get; }
 
         public IServiceCollection Services { get => _services; }
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
 using Sudzekai.LinCtrl.Abi;
 using Sudzekai.LinCtrl.Abi.Allocation;
 using Sudzekai.LinCtrl.Core;
@@ -8,7 +9,8 @@ using Sudzekai.LinCtrl.Abi.Mapping;
 namespace Sudzekai.LinCtrl.Hosting
 {
     internal class AssemblyVTableLoader(
-        ILogger<AssemblyVTableLoader> logger) : IAssemblyLoader
+        ILogger<AssemblyVTableLoader> logger,
+        IConfiguration configuration) : IAssemblyLoader
     {
         public unsafe void Load(AssemblyInfo info)
         {
@@ -22,7 +24,7 @@ namespace Sudzekai.LinCtrl.Hosting
                 throw new InvalidOperationException($"Assembly not exports \"{AssemblyExports.ExchangeVTables}\"");
 
             var func = (delegate* unmanaged[Cdecl]<HostVTableDescriptor*, AssemblyVTableDescriptor**, int>)getVTableAddress;
-            var hostVTable = HostVTableAllocator.Alloc(LinCtrlContext.AbiVersion);
+            var hostVTable = HostVTableAllocator.Alloc(LinCtrlContext.AbiVersion, configuration.AsEnumerable());
             AssemblyVTableDescriptor* assemblyVTablePtr = null;
 
             try
@@ -37,6 +39,7 @@ namespace Sudzekai.LinCtrl.Hosting
             }
             finally
             {
+                HostVTableAllocator.Free(ref hostVTable);
                 CoTaskAllocator.Free(ref assemblyVTablePtr);
             }
 

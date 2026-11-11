@@ -13,6 +13,9 @@ namespace Sudzekai.LinCtrl.Hosting
                 builder.Services.AddAssemblyServices();
                 builder.Services.RegisterRequestHandlerServices();
                 builder.Services.AddPluginServices();
+
+                if (builder.Configuration["LinCtrlDatabase:Host"] != null || builder.Configuration["Jwt:Secret"] != null)
+                    builder.Services.AddLinCtrlAuthentication(builder.Configuration);
             }
         }
     }

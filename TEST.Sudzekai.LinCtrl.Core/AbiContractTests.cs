@@ -1,4 +1,8 @@
-﻿using Sudzekai.LinCtrl.Abi;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Sudzekai.LinCtrl.Assembly;
+using Sudzekai.LinCtrl.Assembly.Context;
+using Sudzekai.LinCtrl.Abi;
 using Sudzekai.LinCtrl.Abi.Allocation;
 using Sudzekai.LinCtrl.Abi.Managed;
 using Sudzekai.LinCtrl.Abi.Mapping;
@@ -142,6 +146,39 @@ namespace TEST.Sudzekai.LinCtrl.Core
                     CoTaskAllocator.Free(ref descriptor);
                 }
             }
+        }
+
+        [Fact]
+        public unsafe void PluginConfigurationSurvivesReleaseOfHostDescriptor()
+        {
+            var hostConfiguration = new ConfigurationBuilder().AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    ["Storage:Paths:0"] = "/data",
+                    ["Jwt:Issuer"] = "LinCtrl",
+                    ["Empty"] = string.Empty,
+                    ["ExplicitNull"] = null
+                }).Build();
+            var descriptor = HostVTableAllocator.Alloc(LinCtrlContext.AbiVersion, hostConfiguration.AsEnumerable());
+            AssemblyContext context;
+            try
+            {
+                context = new(&descriptor);
+            }
+            finally
+            {
+                HostVTableAllocator.Free(ref descriptor);
+            }
+
+            Assert.False(descriptor.IsAllocated);
+            var builder = AssemblyHost.CreateBuilder(context);
+            Assert.Equal("/data", builder.Configuration["storage:paths:0"]);
+            Assert.Equal("LinCtrl", builder.Configuration["Jwt:Issuer"]);
+            Assert.Equal(string.Empty, builder.Configuration["Empty"]);
+            Assert.Contains(builder.Configuration.GetChildren(), child => child.Key == "ExplicitNull" && child.Value is null);
+
+            using var host = builder.Build();
+            Assert.Same(builder.Configuration, host.Services.GetRequiredService<IConfiguration>());
         }
 
         [Fact]

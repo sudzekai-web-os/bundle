@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Sudzekai.LinCtrl.Abi.Mapping\Sudzekai.LinCtrl.Abi.Mapping.csproj" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.14" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.14" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.14" />
   </ItemGroup>

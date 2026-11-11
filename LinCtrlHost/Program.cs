@@ -1,9 +1,14 @@
-using Serilog;
+﻿using Serilog;
 using Sudzekai.LinCtrl.Hosting;
 
 var builder = WebApplication.CreateSlimBuilder(args);
 
+builder.Configuration.AddJsonFile("local/appsettings.json", optional: true);
+builder.Configuration.AddEnvironmentVariables();
 builder.AddLinCtrlInfrastructure();
+
+if (builder.Environment.IsDevelopment())
+    builder.Services.AddOpenApi();
 
 builder.Logging.ClearProviders();
 

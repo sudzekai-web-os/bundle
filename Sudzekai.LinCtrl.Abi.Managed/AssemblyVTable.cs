@@ -1,10 +1,12 @@
 ﻿using Sudzekai.LinCtrl.Abi.Managed.Types.Delegates;
 
+using Sudzekai.LinCtrl.Core;
+
 namespace Sudzekai.LinCtrl.Abi.Managed
 {
     public class AssemblyVTable
     {
-        public int AbiVersion { get; set; } = 1;
+        public int AbiVersion { get; set; } = (int)LinCtrlContext.AbiVersion;
 
         public InitDelegate InitDelegate { get; set; } = () 
             => { throw new InvalidOperationException($"{nameof(InitDelegate)} not configured"); };

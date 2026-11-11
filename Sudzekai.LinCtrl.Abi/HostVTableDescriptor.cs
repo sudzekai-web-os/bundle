@@ -5,10 +5,13 @@ namespace Sudzekai.LinCtrl.Abi
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct HostVTableDescriptor(
-        uint abiVersion) : IAllocationState
+        uint abiVersion,
+        StringToStringDictionaryDescriptor configuration = default) : IAllocationState
     {
         public uint AbiVersion = abiVersion;
 
-        public readonly bool IsAllocated => false;
+        public StringToStringDictionaryDescriptor Configuration = configuration;
+
+        public readonly bool IsAllocated => Configuration.IsAllocated;
     }
 }
