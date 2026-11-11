@@ -16,7 +16,7 @@
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <PackageId>Sudzekai.LinCtrl.Abi.Mapping</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Title>Sudzekai LinCtrl ABI Mapping</Title>
     <Description>Marshalling between managed models and native ABI descriptors, including plugin callbacks and lifetime coordination.</Description>
     <Authors>Sudzekai</Authors>

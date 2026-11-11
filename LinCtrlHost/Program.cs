@@ -5,6 +5,12 @@ var builder = WebApplication.CreateSlimBuilder(args);
 
 builder.Configuration.AddJsonFile("local/appsettings.json", optional: true);
 builder.Configuration.AddEnvironmentVariables();
+builder.Configuration.AddCommandLine(args);
+
+if (!int.TryParse(builder.Configuration["LinCtrl:Port"], out var port) || port is < 1 or > 65535)
+    throw new InvalidOperationException("LinCtrl:Port must be an integer between 1 and 65535");
+
+builder.WebHost.ConfigureKestrel(options => options.ListenLocalhost(port));
 builder.AddLinCtrlInfrastructure();
 
 if (builder.Environment.IsDevelopment())

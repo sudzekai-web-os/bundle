@@ -10,7 +10,7 @@
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <PackageId>Sudzekai.LinCtrl.Abi</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Title>Sudzekai LinCtrl ABI</Title>
     <Description>Native ABI descriptors, function tables, and buffer views for Sudzekai LinCtrl hosts and plugins.</Description>
     <Authors>Sudzekai</Authors>
