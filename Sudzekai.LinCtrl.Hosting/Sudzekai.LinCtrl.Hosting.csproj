@@ -36,7 +36,7 @@
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <PackageId>Sudzekai.LinCtrl.Hosting</PackageId>
-    <Version>0.5.0</Version>
+    <Version>0.5.1</Version>
     <Title>Sudzekai LinCtrl Hosting</Title>
     <Description>Интеграция с ASP.NET Core для загрузки плагинов Native AOT, регистрации HTTP-маршрутов и управления запуском и выгрузкой плагинов.</Description>
     <Authors>Sudzekai</Authors>

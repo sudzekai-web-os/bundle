@@ -40,22 +40,28 @@ namespace Sudzekai.LinCtrl.Hosting
                         }
                     }
 
-                    var operation = new OpenApiJsonReader().ReadFragment<OpenApiOperation>(
-                        node, OpenApiSpecVersion.OpenApi3_1, document, out var diagnostic);
-                    if (operation == null || diagnostic.Errors.Count != 0)
+                    var path = OpenApiMetadataWriter.NormalizePath(pattern);
+                    var httpMethod = new HttpMethod(method);
+                    var fragment = new JsonObject
                     {
-                        logger.LogWarning("Invalid OpenAPI operation for route {pattern}", pattern);
+                        [path] = new JsonObject { [method.ToLowerInvariant()] = node }
+                    };
+                    var paths = new OpenApiJsonReader().ReadFragment<OpenApiPaths>(
+                        fragment, OpenApiSpecVersion.OpenApi3_1, document, out var diagnostic);
+                    if (diagnostic.Errors.Count != 0 || paths == null || !paths.TryGetValue(path, out var source)
+                        || source.Operations == null || !source.Operations.TryGetValue(httpMethod, out var operation))
+                    {
+                        logger.LogWarning("Invalid OpenAPI operation for route {method} {pattern}: {errors}",
+                            method, pattern, string.Join("; ", diagnostic.Errors));
                         continue;
                     }
-
-                    var path = OpenApiMetadataWriter.NormalizePath(pattern);
                     document.Paths ??= new OpenApiPaths();
                     if (!document.Paths.TryGetValue(path, out var item) || item is not OpenApiPathItem pathItem)
                     {
                         pathItem = new OpenApiPathItem();
                         document.Paths[path] = pathItem;
                     }
-                    pathItem.AddOperation(new HttpMethod(method), operation);
+                    pathItem.AddOperation(httpMethod, operation);
                 }
                 catch (JsonException ex)
                 {

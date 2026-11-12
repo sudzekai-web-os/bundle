@@ -38,6 +38,9 @@ namespace TEST.Sudzekai.LinCtrl.Core
                         Parameters = [new("limit", "query", HostingContext.Default.Int32, "Размер страницы")],
                         Responses = [new(200, HostingContext.Default.PluginManifest), new(400)]
                     }, HttpRequestMethod.Post),
+                    new ResponseHandler("/items/{id:long}", true, HttpResponseDto.Create(HttpStatusCode.OK)),
+                    new ResponseHandler("/items/{id:long}", true, HttpResponseDto.Create(HttpStatusCode.NoContent),
+                        httpMethod: HttpRequestMethod.Delete),
                     new ResponseHandler("/error", true, HttpResponseDto.CreateError(HttpStatusCode.BadRequest, 123, "Rejected")),
                     new ResponseHandler("/raw", true, HttpResponseDto.CreateText(HttpStatusCode.OK, "raw"),
                         new HandlerMetadata
@@ -107,6 +110,15 @@ namespace TEST.Sudzekai.LinCtrl.Core
                 using var openApi = JsonDocument.Parse(await client.GetStringAsync("/openapi/v1.json", cancellationToken));
                 var paths = openApi.RootElement.GetProperty("paths");
                 Assert.True(paths.GetProperty("/host-only").TryGetProperty("get", out _));
+                var item = paths.GetProperty("/items/{id}");
+                foreach (var method in new[] { "get", "delete" })
+                {
+                    var parameter = Assert.Single(item.GetProperty(method).GetProperty("parameters").EnumerateArray());
+                    Assert.Equal("id", parameter.GetProperty("name").GetString());
+                    Assert.Equal("path", parameter.GetProperty("in").GetString());
+                    Assert.True(parameter.GetProperty("required").GetBoolean());
+                    Assert.Equal("integer", parameter.GetProperty("schema").GetProperty("type").GetString());
+                }
                 var rawContent = paths.GetProperty("/raw").GetProperty("get").GetProperty("responses").GetProperty("200").GetProperty("content");
                 Assert.True(rawContent.TryGetProperty("text/plain", out _));
                 Assert.False(rawContent.TryGetProperty("application/json", out _));

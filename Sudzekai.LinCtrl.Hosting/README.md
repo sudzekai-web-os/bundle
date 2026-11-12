@@ -3,7 +3,7 @@
 Интеграция с ASP.NET Core для загрузки плагинов Native AOT, регистрации HTTP-маршрутов и управления запуском и выгрузкой плагинов.
 
 ```sh
-dotnet add package Sudzekai.LinCtrl.Hosting --version 0.5.0
+dotnet add package Sudzekai.LinCtrl.Hosting --version 0.5.1
 ```
 
 Требуется .NET 10.
