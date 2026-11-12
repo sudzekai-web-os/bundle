@@ -1,4 +1,4 @@
-﻿using Sudzekai.LinCtrl.Abi.Allocation.Types.Exceptions;
+using Sudzekai.LinCtrl.Abi.Allocation.Types.Exceptions;
 
 namespace Sudzekai.LinCtrl.Abi.Allocation
 {

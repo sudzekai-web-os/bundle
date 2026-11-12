@@ -1,4 +1,4 @@
-﻿using Sudzekai.LinCtrl.Core;
+using Sudzekai.LinCtrl.Core;
 
 namespace Sudzekai.LinCtrl.Abi.Managed
 {
@@ -8,9 +8,9 @@ namespace Sudzekai.LinCtrl.Abi.Managed
 
         public HttpRequestMethod HttpMethod { get; }
 
-        public bool IsFiltering => false;
+        public bool IsFiltered { get => true; }
 
-        public RequestHandlerMetadata? Metadata => null;
+        public HandlerMetadata? Metadata { get => null; }
 
         public HttpResponseDto Handle(HttpRequestDto request);
     }

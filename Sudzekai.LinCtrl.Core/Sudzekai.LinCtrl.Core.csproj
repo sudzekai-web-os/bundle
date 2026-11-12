@@ -15,9 +15,9 @@
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <PackageId>Sudzekai.LinCtrl.Core</PackageId>
-    <Version>0.3.0</Version>
+    <Version>0.4.0</Version>
     <Title>Sudzekai LinCtrl Core</Title>
-    <Description>Shared constants, HTTP enums, and JSON serialization configuration for Sudzekai LinCtrl.</Description>
+    <Description>Общие константы, перечисления HTTP, настройки сериализации JSON и генерация OpenAPI для LinCtrl.</Description>
     <Authors>Sudzekai</Authors>
     <Company>Sudzekai</Company>
     <Product>Sudzekai LinCtrl</Product>

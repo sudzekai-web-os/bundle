@@ -1,12 +1,11 @@
 # Sudzekai.LinCtrl.Abi.Allocation
 
-Allocation and release of unmanaged buffers and descriptors used by the Sudzekai LinCtrl ABI.
+Выделение и освобождение неуправляемой памяти для буферов и дескрипторов ABI LinCtrl.
 
 ```sh
-dotnet add package Sudzekai.LinCtrl.Abi.Allocation --version 0.3.0
+dotnet add package Sudzekai.LinCtrl.Abi.Allocation --version 0.4.0
 ```
 
-Requires .NET 10 for runtime libraries and a compatible .NET 10 SDK for plugin generation.
+Требуется .NET 10.
 
-Source: [sudzekai-web-os/bundle](https://github.com/sudzekai-web-os/bundle).
-License: Apache-2.0.
+Исходный код доступен в [sudzekai-web-os/bundle](https://github.com/sudzekai-web-os/bundle). Лицензия Apache-2.0.

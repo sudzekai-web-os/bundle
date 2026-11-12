@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.OpenApi;
 using Sudzekai.LinCtrl.Core;
 
@@ -16,9 +14,8 @@ namespace Sudzekai.LinCtrl.Hosting
                 LinCtrlContext.AddTypeInfoResolver(HostingContext.Default);
                 builder.Services.ConfigureHttpJsonOptions(options =>
                     options.SerializerOptions.TypeInfoResolverChain.Insert(0, HostingContext.Default));
-                builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApiDescriptionProvider, PluginApiDescriptionProvider>());
                 builder.Services.ConfigureAll<OpenApiOptions>(options =>
-                    options.AddOperationTransformer<ResponseEnvelopeOperationTransformer>());
+                    options.AddDocumentTransformer<RequestHandlerOpenApiDocumentTransformer>());
                 builder.Services.AddAssemblyServices();
                 builder.Services.RegisterRequestHandlerServices();
                 builder.Services.AddPluginServices();

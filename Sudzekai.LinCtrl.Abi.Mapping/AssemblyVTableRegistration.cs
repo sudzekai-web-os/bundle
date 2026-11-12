@@ -169,7 +169,7 @@ namespace Sudzekai.LinCtrl.Abi.Mapping
                     {
                         descriptor.Array[descriptor.Count] = RequestHandlerAllocator.Alloc(pattern, (int)handler.HttpMethod,
                             (delegate* unmanaged[Cdecl]<HttpRequestDtoDescriptor*, HttpResponseDtoDescriptor*, int>)Marshal.GetFunctionPointerForDelegate(callback),
-                            handler.IsFiltering ? 1 : 0);
+                            handler.IsFiltered ? 1 : 0);
                         descriptor.Count++;
                     }
                     catch

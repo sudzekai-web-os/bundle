@@ -1,6 +1,6 @@
-﻿using Sudzekai.LinCtrl.Abi.Managed;
+using Sudzekai.LinCtrl.Extensions;
+using Sudzekai.LinCtrl.Abi.Managed;
 using Microsoft.Extensions.DependencyInjection;
-using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Sudzekai.LinCtrl.Assembly.Context;
 using Sudzekai.LinCtrl.Assembly.Internals.Objects;
@@ -63,12 +63,7 @@ namespace Sudzekai.LinCtrl.Assembly
         }
 
         public string GetHandlersMetadata()
-        {
-            var metadata = GetHandlers().Select(handler => handler.Metadata).OfType<RequestHandlerMetadata>().ToArray();
-            return metadata.Length == 0
-                ? string.Empty
-                : JsonSerializer.Serialize(metadata, RequestHandlerMetadataContext.Default.RequestHandlerMetadataArray);
-        }
+            => GetHandlers().WriteOpenApiMetadata();
 
         public void Dispose()
             => DisposeAsync().AsTask().GetAwaiter().GetResult();

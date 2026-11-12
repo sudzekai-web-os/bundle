@@ -1,4 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Sudzekai.LinCtrl.Abi.Managed;
+using System.Diagnostics.CodeAnalysis;
 using Sudzekai.LinCtrl.Hosting.Internals.Services.Handlers.Services;
 
 namespace Sudzekai.LinCtrl.Hosting
@@ -16,6 +20,15 @@ namespace Sudzekai.LinCtrl.Hosting
                 services.AddSingleton<RequestHandlerLifetimeHost>();
 
                 return services;
+            }
+
+            public void AddHostRequestHandler<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] THandler>(Action<EndpointBuilder> configure, int maxRequestBodyBytes)
+                where THandler : class, IRequestHandler
+            {
+                var key = typeof(THandler);
+                services.TryAddKeyedTransient<IRequestHandler, THandler>(key);
+                services.AddSingleton(new HostRequestHandlerRegistration(
+                    provider => provider.GetRequiredKeyedService<IRequestHandler>(key), configure, maxRequestBodyBytes));
             }
 
             private IServiceCollection AddBuildServices()

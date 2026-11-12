@@ -16,9 +16,9 @@
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <PackageId>Sudzekai.LinCtrl.Abi.Mapping</PackageId>
-    <Version>0.3.0</Version>
+    <Version>0.4.0</Version>
     <Title>Sudzekai LinCtrl ABI Mapping</Title>
-    <Description>Marshalling between managed models and native ABI descriptors, including plugin callbacks and lifetime coordination.</Description>
+    <Description>Преобразование управляемых моделей в нативные дескрипторы ABI и обратно. Пакет также связывает обратные вызовы плагинов и управляет временем их жизни.</Description>
     <Authors>Sudzekai</Authors>
     <Company>Sudzekai</Company>
     <Product>Sudzekai LinCtrl</Product>

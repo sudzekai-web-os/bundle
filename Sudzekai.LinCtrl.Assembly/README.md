@@ -1,14 +1,13 @@
 # Sudzekai.LinCtrl.Assembly
 
-SDK for building Native AOT plugins with dependency injection, HTTP handlers, delegated logging, and generated ABI exports.
+SDK для разработки плагинов Native AOT с внедрением зависимостей, HTTP-обработчиками, журналированием через хост и генерацией экспортов ABI.
 
 ```sh
-dotnet add package Sudzekai.LinCtrl.Assembly --version 0.4.0
+dotnet add package Sudzekai.LinCtrl.Assembly --version 0.5.0
 ```
 
-Requires .NET 10 for runtime libraries and a compatible .NET 10 SDK for plugin generation.
+Требуется .NET 10.
 
-The SDK includes the `Sudzekai.LinCtrl.Assembly.Generator` analyzer, which supplies the `[PluginAssembly]` entry-point generator during compilation. A separate generator package reference is not required.
+SDK включает анализатор `Sudzekai.LinCtrl.Assembly.Generator`. Он генерирует точку входа из `[PluginAssembly]` при сборке проекта. Достаточно ссылки на SDK.
 
-Source: [sudzekai-web-os/bundle](https://github.com/sudzekai-web-os/bundle).
-License: Apache-2.0.
+Исходный код доступен в [sudzekai-web-os/bundle](https://github.com/sudzekai-web-os/bundle). Лицензия Apache-2.0.

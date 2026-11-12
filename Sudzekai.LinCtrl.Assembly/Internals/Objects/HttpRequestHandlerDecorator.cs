@@ -12,9 +12,9 @@ namespace Sudzekai.LinCtrl.Assembly.Internals.Objects
 
         public HttpRequestMethod HttpMethod => handler.HttpMethod;
 
-        public bool IsFiltering => handler.IsFiltering;
+        public bool IsFiltered => handler.IsFiltered;
 
-        public RequestHandlerMetadata? Metadata => handler.Metadata;
+        public HandlerMetadata? Metadata => handler.Metadata;
 
         public HttpResponseDto Handle(HttpRequestDto request)
         {

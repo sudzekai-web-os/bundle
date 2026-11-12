@@ -1,39 +1,37 @@
 # Sudzekai.LinCtrl.Hosting
 
-ASP.NET Core integration for loading Native AOT plugins, registering HTTP endpoints, and coordinating plugin startup and disposal.
+Интеграция с ASP.NET Core для загрузки плагинов Native AOT, регистрации HTTP-маршрутов и управления запуском и выгрузкой плагинов.
 
 ```sh
-dotnet add package Sudzekai.LinCtrl.Hosting --version 0.4.0
+dotnet add package Sudzekai.LinCtrl.Hosting --version 0.5.0
 ```
 
-Requires .NET 10 for runtime libraries and a compatible .NET 10 SDK for plugin generation.
+Требуется .NET 10.
 
-Source: [sudzekai-web-os/bundle](https://github.com/sudzekai-web-os/bundle).
-License: Apache-2.0.
+## Конфигурация плагинов
 
+При загрузке плагин получает снимок полной конфигурации хоста, включая значения из JSON-файлов, переменных окружения и аргументов запуска. Например, `Storage:Path` доступен через `builder.Configuration["Storage:Path"]`. Тот же экземпляр `IConfiguration` зарегистрирован в DI плагина. Снимок включает секреты из конфигурации хоста.
 
-## Plugin configuration
+В ABI 4 дескриптор обработчика передаёт флаг фильтрации, а отдельный делегат передаёт фрагмент OpenAPI. Собирайте хост и плагины с совместимыми версиями SDK.
 
-Each plugin receives a snapshot of the complete host configuration at load time, including settings from JSON files, environment variables and command-line arguments. For example, the host key `Storage:Path` is available as `builder.Configuration["Storage:Path"]`. The same `IConfiguration` is registered in the plugin DI container. The snapshot includes any secrets present in the host configuration.
+## MySQL и вход
 
-ABI version 3 adds the response filtering flag and business error to the handler and response descriptors. Rebuild the host and plugins together.
+Примените [схему MySQL](https://github.com/sudzekai-web-os/bundle/blob/main/Sudzekai.LinCtrl.Hosting.Application/Database/schema.sql) от имени администратора БД. При запуске хост добавляет недостающие роли с идентификаторами из `ClientRole` и проверяет соответствие идентификаторов и имён.
 
-## MySQL and login
+В секции `LinCtrlDatabase` укажите `Host`, `Database`, `Username` и `Password`. В секции `Jwt` укажите `Secret` (минимум 32 байта UTF-8), `Issuer` и `Audience`. Пример хоста также читает `local/appsettings.json`.
 
-Apply [Database/schema.sql](https://github.com/sudzekai-web-os/bundle/blob/dev/Sudzekai.LinCtrl.Hosting/Database/schema.sql) as a database administrator. The application account needs data permissions on the LinCtrl schema. At startup the host seeds the missing `ClientRole` rows and reports any existing ID/name mismatch.
+`AddLinCtrlInfrastructure()` включает авторизацию при наличии адреса БД или секрета JWT. `MapLinCtrlInfrastructure()` регистрирует `POST /auth/login`. Передайте `username` и `password` в JSON. При успешном входе поля `token`, `tokenType`, `expiresIn`, `id`, `roleId` и `username` находятся в `data`. Передавайте JWT в заголовке `Authorization: Bearer <токен>`. Заблокированный пользователь получает HTTP 403 с верными учётными данными и теряет доступ с ранее выданным токеном.
 
-Configure `LinCtrlDatabase:Host`, `Database`, `Username`, and `Password` under the `LinCtrlDatabase` section. Configure `Jwt:Secret` (at least 32 UTF-8 bytes), `Jwt:Issuer`, and `Jwt:Audience` under `Jwt`. The example host also reads `local/appsettings.json` for credentials.
+`IHashService.Hash` формирует хэш Argon2id для `users.password_hash`. Чтобы заменить MySQL, зарегистрируйте свои `IUserRepository` и `IRoleRepository` после `AddLinCtrlInfrastructure()`.
 
-`AddLinCtrlInfrastructure()` enables authentication when a database host or JWT secret is configured. `MapLinCtrlInfrastructure()` maps `POST /auth/login` with JSON fields `username` and `password`. A valid account receives `accessToken`, `tokenType`, and `expiresIn`. Use the bearer token for endpoints configured to require authorization.
+При Native AOT с Connector/NET добавьте `MySql.Data` и `System.Configuration.ConfigurationManager` в `TrimmerRootAssembly` исполняемого проекта, как в `LinCtrlHost`. При сборке Connector/NET возможны предупреждения об обрезке и AOT.
 
-`PasswordHashService.Hash` produces the Argon2id string stored in `users.password_hash`. Register alternate `IUserRepository` and `IRoleRepository` implementations before calling `AddLinCtrlInfrastructure()` to replace MySQL persistence.
+## Ответы и OpenAPI
 
-For Native AOT with the default Connector/NET repositories, preserve `MySql.Data` and `System.Configuration.ConfigurationManager` with `TrimmerRootAssembly` in the executable project, as configured in LinCtrlHost. Connector/NET and its dependencies can report trim and AOT analysis warnings.
+Фильтрация включена по умолчанию для `application/json`. Успешный ответ имеет вид `{"success":true,"data":...}`. Для ошибки используйте `HttpResponseDto.CreateError(statusCode, code, message)`. Ответ имеет вид `{"success":false,"error":{"code":...,"message":"..."}}`. Если бизнес-ошибка отсутствует, используются HTTP-статус и его стандартное описание.
 
-## Response envelopes
+Текст, файлы и ответы без содержимого передаются в исходном формате. Для конкретного обработчика фильтрацию можно отключить через `IsFiltered => false`. HEAD и статусы, запрещающие тело, остаются без тела.
 
-Set `IRequestHandler.IsFiltering` to `true` to return a JSON envelope. Successful 2xx responses use `{"success":true,"data":...}`. JSON payloads retain their shape, text becomes a JSON string, binary data becomes a base64 string, and an empty payload becomes `null`.
+Укажите тело запроса, параметры и ответы в `HandlerMetadata` с соответствующим `JsonTypeInfo`. Для текстовых и файловых ответов задайте `MetadataResponse.ContentType` через аргумент `contentType`. Хост и плагины формируют фрагменты общим генератором, а Hosting объединяет их в документе OpenAPI. Схема JSON-ответа учитывает фильтрацию.
 
-Use `HttpResponseDto.CreateError(statusCode, code, message)` from `Sudzekai.LinCtrl.Assembly.Extensions` for business errors. A filtered failure uses `{"success":false,"error":{"code":...,"message":"..."}}`. Without a business error, the envelope uses the HTTP status and its standard reason phrase. Filtered failures discard response data. HEAD and status codes that prohibit a body remain bodyless.
-
-Filtered handlers publish JSON response envelope metadata to ASP.NET Core API Explorer. Success data can contain any JSON value because the plugin serializes it across the ABI.
+Исходный код доступен в [sudzekai-web-os/bundle](https://github.com/sudzekai-web-os/bundle). Лицензия Apache-2.0.

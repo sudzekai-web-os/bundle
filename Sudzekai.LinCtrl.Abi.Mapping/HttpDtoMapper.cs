@@ -13,19 +13,14 @@ namespace Sudzekai.LinCtrl.Abi.Mapping
                 request.Cookies, (int)request.ContentType, request.Body);
 
         public static HttpResponseDtoDescriptor ToDescriptor(HttpResponseDto response)
-            => response.Error is { } error
-                ? HttpResponseDtoAllocator.AllocError((int)response.ContentType, (int)response.StatusCode, error.Code, error.Message)
-                : HttpResponseDtoAllocator.Alloc((int)response.ContentType, (int)response.StatusCode, response.Data);
+            => HttpResponseDtoAllocator.Alloc((int)response.ContentType, (int)response.StatusCode, response.Data);
 
         public static HttpResponseDto ToManaged(HttpResponseDtoDescriptor response)
             => new()
             {
                 ContentType = (ResponseContentType)response.ContentType,
                 StatusCode = (HttpStatusCode)response.StatusCode,
-                Data = ToManaged(response.Data),
-                Error = response.ErrorMessage.IsAllocated
-                    ? new ResponseError(response.ErrorCode, StringMapper.ToManaged(response.ErrorMessage))
-                    : null
+                Data = ToManaged(response.Data)
             };
 
         public static HttpRequestDto ToManaged(HttpRequestDtoDescriptor request)

@@ -1,8 +1,4 @@
-﻿using Sudzekai.LinCtrl.Abi;
-using Sudzekai.LinCtrl.Abi.Allocation;
-using Sudzekai.LinCtrl.Abi.Managed;
-using Sudzekai.LinCtrl.Core;
-using Sudzekai.LinCtrl.Hosting.Objects;
+﻿using Sudzekai.LinCtrl.Hosting.Objects;
 using System.Text.Json.Serialization;
 
 namespace Sudzekai.LinCtrl.Hosting
@@ -10,12 +6,8 @@ namespace Sudzekai.LinCtrl.Hosting
     [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase, PropertyNameCaseInsensitive = true)]
     [JsonSerializable(typeof(int))]
     [JsonSerializable(typeof(long))]
-    [JsonSerializable(typeof(LoginCommand))]
-    [JsonSerializable(typeof(LoginToken))]
+    [JsonSerializable(typeof(LoginRequest))]
+    [JsonSerializable(typeof(LoginResponse))]
     [JsonSerializable(typeof(PluginManifest))]
-    [JsonSerializable(typeof(SuccessResponseEnvelope))]
-    [JsonSerializable(typeof(ErrorResponseEnvelope))]
-    internal partial class HostingContext : JsonSerializerContext
-    {
-    }
+    internal partial class HostingContext : JsonSerializerContext { }
 }

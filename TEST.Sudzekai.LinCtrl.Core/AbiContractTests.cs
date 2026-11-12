@@ -127,7 +127,7 @@ namespace TEST.Sudzekai.LinCtrl.Core
                 var request = new HttpRequestDto { Host = "localhost", Scheme = "http", Path = "/object" };
 
                 var handler = Assert.Single(handlers, h => h.Pattern == "object");
-                Assert.True(handler.IsFiltering);
+                Assert.True(handler.IsFiltered);
                 var response = handler.Handle(request);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.Equal(ResponseContentType.ApplicationJson, response.ContentType);

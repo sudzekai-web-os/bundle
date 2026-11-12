@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Sudzekai.LinCtrl.Core;
+using Sudzekai.LinCtrl.Extensions;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Metadata;
 using Sudzekai.LinCtrl.Abi.Managed;
 using Microsoft.Extensions.Logging;
 using System.Net;
@@ -18,24 +19,8 @@ namespace Sudzekai.LinCtrl.Hosting
             builder.ConventionBuilder.Add(c =>
             {
                 c.RequestDelegate = GetRequestDelegate(builder);
-                if (builder.Handler.IsFiltering || builder.Metadata != null)
-                    c.Metadata.Add(c.RequestDelegate.Method);
-
-                if (builder.Metadata is { } metadata)
-                {
-                    c.Metadata.Add(metadata);
-                    c.Metadata.Add(new EndpointSummaryAttribute(metadata.Summary));
-                    c.Metadata.Add(new EndpointDescriptionAttribute(metadata.Description));
-                    if (!string.IsNullOrWhiteSpace(metadata.Group))
-                        c.Metadata.Add(new TagsAttribute(metadata.Group));
-                    if (builder.Handler.IsFiltering)
-                        foreach (var statusCode in metadata.ResponseStatusCodes)
-                            c.Metadata.Add(ResponseEnvelopeMetadata.Create(statusCode));
-                }
+                builder.Configure?.Invoke(c);
             });
-
-            if (builder.Handler.IsFiltering)
-                builder.ConventionBuilder.Finally(ResponseEnvelopeMetadata.Apply);
 
             logger.LogDebug("[{tag}] Delegate built", builder.GetTag());
         }
@@ -44,22 +29,50 @@ namespace Sudzekai.LinCtrl.Hosting
         {
             return async (ctx) =>
             {
-                var request = await ctx.Request.ToRequestDto();
+                byte[]? body = null;
+                if (builder.MaxRequestBodyBytes is { } limit)
+                {
+                    ctx.Response.Headers.CacheControl = "no-store";
+                    if (ctx.Request.ContentLength > limit)
+                    {
+                        await WritePayloadTooLargeAsync(ctx, builder.IsFiltered);
+                        return;
+                    }
+
+                    try
+                    {
+                        var buffer = new byte[limit + 1];
+                        var length = await ctx.Request.Body.ReadAtLeastAsync(buffer, buffer.Length, false, ctx.RequestAborted);
+                        if (length > limit)
+                        {
+                            await WritePayloadTooLargeAsync(ctx, builder.IsFiltered);
+                            return;
+                        }
+                        body = buffer[..length];
+                    }
+                    catch (BadHttpRequestException ex) when (ex.StatusCode == StatusCodes.Status413PayloadTooLarge)
+                    {
+                        await WritePayloadTooLargeAsync(ctx, builder.IsFiltered);
+                        return;
+                    }
+                }
+
+                var request = await ctx.Request.ToRequestDto(body);
 
                 HttpResponseDto response;
                 try
                 {
-                    response = builder.Handler.Handle(request);
+                    response = builder.Resolve(ctx.RequestServices).Handle(request);
                 }
-                catch (Exception ex) when (builder.Handler.IsFiltering && ex is not OperationCanceledException)
+                catch (Exception ex) when (builder.IsFiltered && ex is not OperationCanceledException)
                 {
                     logger.LogError(ex, "[{tag}] Request handler failed", builder.GetTag());
-                    response = new HttpResponseDto { StatusCode = HttpStatusCode.InternalServerError };
+                    response = new HttpResponseDto { StatusCode = HttpStatusCode.InternalServerError, ContentType = ResponseContentType.ApplicationJson };
                 }
 
                 ctx.Response.StatusCode = (int)response.StatusCode;
 
-                if (builder.Handler.IsFiltering)
+                if (builder.IsFiltered && response.ContentType == ResponseContentType.ApplicationJson)
                 {
                     if (ResponseEnvelopeWriter.AllowsBody((int)response.StatusCode))
                         await ResponseEnvelopeWriter.WriteAsync(ctx, response);
@@ -73,7 +86,8 @@ namespace Sudzekai.LinCtrl.Hosting
 
                 var isHead = HttpMethods.IsHead(ctx.Request.Method);
 
-                ctx.Response.ContentType = response.ContentType.ToMimeString() + "; charset=utf-8";
+                if (response.ContentType != ResponseContentType.None)
+                    ctx.Response.ContentType = response.ContentType.ToMimeString() + "; charset=utf-8";
 
                 if (isHead)
                 {
@@ -100,6 +114,14 @@ namespace Sudzekai.LinCtrl.Hosting
                     ctx.Response.ContentLength = 0;
                 }
             };
+        }
+
+        private static async Task WritePayloadTooLargeAsync(HttpContext context, bool isFiltered)
+        {
+            if (isFiltered)
+                await ResponseEnvelopeWriter.WriteAsync(context, new HttpResponseDto { StatusCode = HttpStatusCode.RequestEntityTooLarge });
+            else
+                context.Response.StatusCode = StatusCodes.Status413PayloadTooLarge;
         }
     }
 }

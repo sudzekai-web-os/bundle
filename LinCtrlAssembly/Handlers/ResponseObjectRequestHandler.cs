@@ -12,7 +12,7 @@ namespace LinCtrlAssembly.Handlers
 
         public HttpRequestMethod HttpMethod => HttpRequestMethod.Get;
 
-        public bool IsFiltering => true;
+        public bool IsFiltered => true;
 
         public HttpResponseDto Handle(HttpRequestDto request)
         {

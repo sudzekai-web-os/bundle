@@ -1,14 +1,13 @@
 # Sudzekai.LinCtrl.Assembly.Generator
 
-Roslyn source generator for Native AOT plugin entry points and ABI function-table exchange in Sudzekai LinCtrl.
+Генератор исходного кода Roslyn для точек входа плагинов Native AOT и обмена таблицами функций ABI LinCtrl.
 
 ```sh
-dotnet add package Sudzekai.LinCtrl.Assembly.Generator --version 0.1.0
+dotnet add package Sudzekai.LinCtrl.Assembly.Generator --version 0.2.0
 ```
 
-Requires .NET 10 for runtime libraries and a compatible .NET 10 SDK for plugin generation.
+Требуется .NET 10.
 
-This is a compiler analyzer package. Its generator is installed under `analyzers/dotnet/cs`; it is not a runtime library. The plugin SDK already includes this generator, so SDK consumers do not need to install this standalone package.
+Анализатор устанавливается в `analyzers/dotnet/cs` и используется компилятором. Пакет `Sudzekai.LinCtrl.Assembly` уже включает его.
 
-Source: [sudzekai-web-os/bundle](https://github.com/sudzekai-web-os/bundle).
-License: Apache-2.0.
+Исходный код доступен в [sudzekai-web-os/bundle](https://github.com/sudzekai-web-os/bundle). Лицензия Apache-2.0.

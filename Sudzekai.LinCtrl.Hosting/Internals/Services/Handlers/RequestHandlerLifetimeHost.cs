@@ -1,4 +1,6 @@
-﻿using Sudzekai.LinCtrl.Abi.Managed;
+using Sudzekai.LinCtrl.Extensions;
+using System.Text.Json;
+using Sudzekai.LinCtrl.Abi.Managed;
 using Microsoft.Extensions.Logging;
 using Sudzekai.LinCtrl.Core;
 
@@ -12,10 +14,36 @@ namespace Sudzekai.LinCtrl.Hosting
         public void Remove(IEnumerable<IRequestHandler> handlers)
             => dataSource.Remove(handlers);
 
-        public HttpRequestHandlerBuilder Build(IRequestHandler requestHandler, RequestHandlerMetadata? metadata = null)
+        public void Build(IRequestHandler handler, JsonElement? paths, HostRequestHandlerRegistration? registration = null)
         {
-            var builder = new HttpRequestHandlerBuilder(requestHandler) { Metadata = metadata };
+            var builder = registration == null
+                ? new HttpRequestHandlerBuilder(handler)
+                : new HttpRequestHandlerBuilder(registration, handler.Pattern,
+                    handler.HttpMethod, handler.IsFiltered, registration.Resolve)
+                {
+                    Configure = registration.Configure,
+                    MaxRequestBodyBytes = registration.MaxRequestBodyBytes
+                };
 
+            var path = OpenApiMetadataWriter.NormalizePath(handler.Pattern);
+            var method = handler.HttpMethod.ToString().ToLowerInvariant();
+            if (paths is { } operations && operations.TryGetProperty(path, out var methods)
+                && methods.TryGetProperty(method, out var operation))
+            {
+                builder.OpenApiOperation = operation.GetRawText();
+            }
+            else if (handler.Metadata != null || handler.IsFiltered)
+            {
+                using var document = JsonDocument.Parse(new[] { handler }.WriteOpenApiMetadata());
+                builder.OpenApiOperation = document.RootElement.GetProperty("paths")
+                    .GetProperty(path).GetProperty(method).GetRawText();
+            }
+
+            Build(builder);
+        }
+
+        private HttpRequestHandlerBuilder Build(HttpRequestHandlerBuilder builder)
+        {
             logger.LogInformation("[{tag}] Handler building started", builder.GetTag());
 
             try
@@ -25,7 +53,7 @@ namespace Sudzekai.LinCtrl.Hosting
             }
             catch
             {
-                dataSource.Remove([requestHandler]);
+                dataSource.Remove([builder.Registration]);
                 throw;
             }
 

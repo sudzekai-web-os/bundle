@@ -1,12 +1,11 @@
 # Sudzekai.LinCtrl.Core
 
-Shared constants, HTTP enums, and JSON serialization configuration for Sudzekai LinCtrl.
+Общие константы, перечисления HTTP, настройки сериализации JSON и генерация OpenAPI для LinCtrl.
 
 ```sh
-dotnet add package Sudzekai.LinCtrl.Core --version 0.3.0
+dotnet add package Sudzekai.LinCtrl.Core --version 0.4.0
 ```
 
-Requires .NET 10 for runtime libraries and a compatible .NET 10 SDK for plugin generation.
+Требуется .NET 10.
 
-Source: [sudzekai-web-os/bundle](https://github.com/sudzekai-web-os/bundle).
-License: Apache-2.0.
+Исходный код доступен в [sudzekai-web-os/bundle](https://github.com/sudzekai-web-os/bundle). Лицензия Apache-2.0.

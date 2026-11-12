@@ -1,12 +1,13 @@
 # Sudzekai.LinCtrl.Abi.Managed
 
-Managed request and response DTOs, plugin callbacks, and handler contracts for the Sudzekai LinCtrl ABI.
+Управляемые DTO запросов и ответов, обратные вызовы плагинов и контракты обработчиков ABI LinCtrl.
 
 ```sh
-dotnet add package Sudzekai.LinCtrl.Abi.Managed --version 0.4.0
+dotnet add package Sudzekai.LinCtrl.Abi.Managed --version 0.5.0
 ```
 
-Requires .NET 10 for runtime libraries and a compatible .NET 10 SDK for plugin generation.
+Требуется .NET 10.
 
-Source: [sudzekai-web-os/bundle](https://github.com/sudzekai-web-os/bundle).
-License: Apache-2.0.
+Флаг `IRequestHandler.IsFiltered` по умолчанию включён. Hosting применяет обёртку к ответам `application/json`. Запросы, параметры и ответы описываются через `HandlerMetadata` и `JsonTypeInfo`.
+
+Исходный код доступен в [sudzekai-web-os/bundle](https://github.com/sudzekai-web-os/bundle). Лицензия Apache-2.0.

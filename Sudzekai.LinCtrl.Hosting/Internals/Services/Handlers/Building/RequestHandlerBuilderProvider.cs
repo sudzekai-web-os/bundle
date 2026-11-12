@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 
@@ -21,7 +21,7 @@ namespace Sudzekai.LinCtrl.Hosting
 
             logger.LogDebug("[{tag}] Creating handler builder...", builder.GetTag());
 
-            builder.ConventionBuilder = dataSource.Add(builder.Handler);
+            builder.ConventionBuilder = dataSource.Add(builder.Registration, builder.Pattern, builder.HttpMethod, builder.OpenApiOperation);
 
             logger.LogDebug("[{tag}] Handler builder created", builder.GetTag());
         }

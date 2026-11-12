@@ -10,6 +10,5 @@ namespace Sudzekai.LinCtrl.Abi.Managed
         public HttpStatusCode StatusCode;
 
         public byte[] Data = [];
-        public ResponseError? Error;
     }
 }

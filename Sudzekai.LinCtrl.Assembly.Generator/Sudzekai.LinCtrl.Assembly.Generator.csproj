@@ -18,9 +18,9 @@
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <PackageId>Sudzekai.LinCtrl.Assembly.Generator</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Title>Sudzekai LinCtrl Assembly Generator</Title>
-    <Description>Roslyn source generator for Native AOT plugin entry points and ABI function-table exchange in Sudzekai LinCtrl.</Description>
+    <Description>Генератор исходного кода Roslyn для точек входа плагинов Native AOT и обмена таблицами функций ABI LinCtrl.</Description>
     <Authors>Sudzekai</Authors>
     <Company>Sudzekai</Company>
     <Product>Sudzekai LinCtrl</Product>

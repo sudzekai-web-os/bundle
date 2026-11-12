@@ -1,4 +1,5 @@
-﻿using Sudzekai.LinCtrl.Abi.Managed;
+using Sudzekai.LinCtrl.Extensions;
+using Sudzekai.LinCtrl.Abi.Managed;
 using Sudzekai.LinCtrl.Core;
 
 namespace Sudzekai.LinCtrl.Hosting
@@ -7,11 +8,13 @@ namespace Sudzekai.LinCtrl.Hosting
     {
         extension(Microsoft.AspNetCore.Http.HttpRequest req)
         {
-            public async Task<HttpRequestDto> ToRequestDto()
+            public async Task<HttpRequestDto> ToRequestDto(byte[]? bufferedBody = null)
             {
                 byte[] body;
 
-                if (req.ContentLength is > 0 and var length)
+                if (bufferedBody != null)
+                    body = bufferedBody;
+                else if (req.ContentLength is > 0 and var length)
                 {
                     body = new byte[length];
                     await req.Body.ReadExactlyAsync(body);

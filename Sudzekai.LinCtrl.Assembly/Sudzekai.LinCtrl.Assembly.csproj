@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Sudzekai.LinCtrl.Abi.Mapping\Sudzekai.LinCtrl.Abi.Mapping.csproj" />
+    <ProjectReference Include="..\Sudzekai.LinCtrl.Extensions\Sudzekai.LinCtrl.Extensions.csproj" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.14" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.14" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.14" />
@@ -26,9 +27,9 @@
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <PackageId>Sudzekai.LinCtrl.Assembly</PackageId>
-    <Version>0.4.0</Version>
+    <Version>0.5.0</Version>
     <Title>Sudzekai LinCtrl Plugin SDK</Title>
-    <Description>SDK for building Native AOT plugins with dependency injection, HTTP handlers, delegated logging, and generated ABI exports.</Description>
+    <Description>SDK для разработки плагинов Native AOT с внедрением зависимостей, HTTP-обработчиками, журналированием через хост и генерацией экспортов ABI.</Description>
     <Authors>Sudzekai</Authors>
     <Company>Sudzekai</Company>
     <Product>Sudzekai LinCtrl</Product>

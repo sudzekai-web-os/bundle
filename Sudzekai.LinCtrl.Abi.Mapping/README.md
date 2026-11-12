@@ -1,12 +1,11 @@
 # Sudzekai.LinCtrl.Abi.Mapping
 
-Marshalling between managed models and native ABI descriptors, including plugin callbacks and lifetime coordination.
+Преобразование управляемых моделей в нативные дескрипторы ABI и обратно. Пакет также связывает обратные вызовы плагинов и управляет временем их жизни.
 
 ```sh
-dotnet add package Sudzekai.LinCtrl.Abi.Mapping --version 0.3.0
+dotnet add package Sudzekai.LinCtrl.Abi.Mapping --version 0.4.0
 ```
 
-Requires .NET 10 for runtime libraries and a compatible .NET 10 SDK for plugin generation.
+Требуется .NET 10.
 
-Source: [sudzekai-web-os/bundle](https://github.com/sudzekai-web-os/bundle).
-License: Apache-2.0.
+Исходный код доступен в [sudzekai-web-os/bundle](https://github.com/sudzekai-web-os/bundle). Лицензия Apache-2.0.

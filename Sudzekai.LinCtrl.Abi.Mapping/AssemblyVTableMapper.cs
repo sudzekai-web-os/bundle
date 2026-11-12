@@ -219,7 +219,7 @@ namespace Sudzekai.LinCtrl.Abi.Mapping
                 _session = session;
                 Pattern = StringMapper.ToManaged(descriptor.Pattern);
                 HttpMethod = (HttpRequestMethod)descriptor.HttpMethod;
-                IsFiltering = descriptor.IsFiltering != 0;
+                IsFiltered = descriptor.IsFiltering != 0;
                 _handle = descriptor.HandleDelegate;
             }
 
@@ -227,7 +227,7 @@ namespace Sudzekai.LinCtrl.Abi.Mapping
 
             public HttpRequestMethod HttpMethod { get; }
 
-            public bool IsFiltering { get; }
+            public bool IsFiltered { get; }
 
             public HttpResponseDto Handle(HttpRequestDto request)
                 => _session.Handle(_handle, request);

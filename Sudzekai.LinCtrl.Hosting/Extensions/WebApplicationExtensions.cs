@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Sudzekai.LinCtrl.Extensions;
+using System.Text.Json;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Metadata;
+using Sudzekai.LinCtrl.Hosting.Internals.Services.Authentication.Services;
 
 namespace Sudzekai.LinCtrl.Hosting
 {
@@ -13,27 +14,23 @@ namespace Sudzekai.LinCtrl.Hosting
             {
                 application.Services.GetRequiredService<RequestHandlerBuilderProvider>().SetRouteBuilder(application);
 
-                if (!application.Services.GetRequiredService<IServiceProviderIsService>().IsService(typeof(LoginHandler)))
-                    return;
+                if (application.Services.GetRequiredService<IServiceProviderIsService>().IsService(typeof(IJwtTokenService)))
+                {
+                    application.UseAuthentication();
+                    application.UseMiddleware<JwtMiddleware>();
+                    application.UseAuthorization();
+                    application.UseRateLimiter();
+                }
 
-                application.UseAuthentication();
-                application.UseAuthorization();
-                application.UseRateLimiter();
-
-                application.MapPost(LoginHandler.Pattern, (Func<HttpContext, Task>)(context =>
-                    context.RequestServices.GetRequiredService<LoginHandler>().HandleAsync(context)))
-                    .WithName("LinCtrl.Login")
-                    .WithSummary("Sign in")
-                    .AllowAnonymous()
-                    .RequireRateLimiting(AuthenticationServicesDependencyInjection.LoginRateLimit)
-                    .WithMetadata(
-                        new AcceptsMetadata(["application/json"], typeof(LoginCommand)),
-                        new ProducesResponseTypeMetadata(200, typeof(LoginToken), ["application/json"]),
-                        new ProducesResponseTypeMetadata(400, typeof(void), []),
-                        new ProducesResponseTypeMetadata(401, typeof(void), []),
-                        new ProducesResponseTypeMetadata(413, typeof(void), []),
-                        new ProducesResponseTypeMetadata(415, typeof(void), []),
-                        new ProducesResponseTypeMetadata(429, typeof(void), []));
+                var handlers = application.Services.GetRequiredService<RequestHandlerLifetimeHost>();
+                using var scope = application.Services.CreateScope();
+                var registrations = application.Services.GetServices<HostRequestHandlerRegistration>()
+                    .Select(registration => (Registration: registration, Handler: registration.Resolve(scope.ServiceProvider)))
+                    .ToArray();
+                using var document = JsonDocument.Parse(registrations.Select(entry => entry.Handler).WriteOpenApiMetadata());
+                var paths = document.RootElement.GetProperty("paths");
+                foreach (var entry in registrations)
+                    handlers.Build(entry.Handler, paths, entry.Registration);
             }
 
             public void LoadPlugins(string pluginsDirectoryPath = "plugins")

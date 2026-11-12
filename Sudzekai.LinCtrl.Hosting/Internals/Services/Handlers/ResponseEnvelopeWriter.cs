@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.WebUtilities;
 using Sudzekai.LinCtrl.Abi.Managed;
 using Sudzekai.LinCtrl.Core;
 using System.Buffers;
-using System.Text;
 using System.Text.Json;
 
 namespace Sudzekai.LinCtrl.Hosting
@@ -56,11 +55,33 @@ namespace Sudzekai.LinCtrl.Hosting
             else
             {
                 writer.WriteStartObject("error");
-                writer.WriteNumber("code", response.Error?.Code ?? statusCode);
-                writer.WriteString("message", response.Error?.Message ?? ReasonPhrases.GetReasonPhrase(statusCode));
+                var (code, message) = ReadError(response, statusCode);
+                writer.WriteNumber("code", code);
+                writer.WriteString("message", message);
                 writer.WriteEndObject();
             }
             writer.WriteEndObject();
+        }
+
+        private static (int Code, string Message) ReadError(HttpResponseDto response, int statusCode)
+        {
+            if (response.ContentType == ResponseContentType.ApplicationJson && response.Data.Length > 0)
+            {
+                try
+                {
+                    using var json = JsonDocument.Parse(response.Data);
+                    var root = json.RootElement;
+                    if (root.ValueKind == JsonValueKind.Object && root.EnumerateObject().Count() == 2
+                        && root.TryGetProperty("code", out var code) && code.ValueKind == JsonValueKind.Number
+                        && code.TryGetInt32(out var value) && root.TryGetProperty("message", out var message)
+                        && message.ValueKind == JsonValueKind.String)
+                        return (value, message.GetString()!);
+                }
+                catch (JsonException)
+                {
+                }
+            }
+            return (statusCode, ReasonPhrases.GetReasonPhrase(statusCode));
         }
 
         private static void WriteData(Utf8JsonWriter writer, HttpResponseDto response)
@@ -71,22 +92,7 @@ namespace Sudzekai.LinCtrl.Hosting
                 return;
             }
 
-            switch (response.ContentType)
-            {
-                case ResponseContentType.ApplicationJson:
-                    writer.WriteRawValue(response.Data);
-                    break;
-                case ResponseContentType.TextPlain:
-                case ResponseContentType.TextHtml:
-                case ResponseContentType.TextCsv:
-                case ResponseContentType.ApplicationFormUrlEncoded:
-                case ResponseContentType.ImageSvgXml:
-                    writer.WriteStringValue(Encoding.UTF8.GetString(response.Data));
-                    break;
-                default:
-                    writer.WriteBase64StringValue(response.Data);
-                    break;
-            }
+            writer.WriteRawValue(response.Data);
         }
     }
 }

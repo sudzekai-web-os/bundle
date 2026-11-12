@@ -37,9 +37,6 @@ namespace Sudzekai.LinCtrl.Abi.Allocation
             }
         }
 
-        public static HttpResponseDtoDescriptor AllocError(int contentType, int statusCode, int errorCode, string message)
-            => new(contentType, statusCode, default, errorCode, StringAllocator.Alloc(message));
-
         public static void Free(ref HttpResponseDtoDescriptor descriptor)
         {
             if (!descriptor.IsAllocated)
@@ -47,7 +44,6 @@ namespace Sudzekai.LinCtrl.Abi.Allocation
 
             ByteArrayAllocator.Free(ref descriptor.Data);
 
-            StringAllocator.Free(ref descriptor.ErrorMessage);
             descriptor = default;
         }
     }

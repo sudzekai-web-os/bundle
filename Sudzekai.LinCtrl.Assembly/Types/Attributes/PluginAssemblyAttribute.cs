@@ -1,7 +1,5 @@
 namespace Sudzekai.LinCtrl.Assembly
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public sealed class PluginAssemblyAttribute : Attribute
-    {
-    }
+    public sealed class PluginAssemblyAttribute : Attribute { }
 }

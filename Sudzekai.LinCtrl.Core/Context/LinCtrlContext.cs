@@ -1,11 +1,11 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 
 namespace Sudzekai.LinCtrl.Core 
 {
     public static class LinCtrlContext
     {
-        public const uint AbiVersion = 3;
+        public const uint AbiVersion = 4;
 
         public static JsonSerializerOptions JsonSerializerOptions { get; set; } = new()
         {
@@ -14,6 +14,9 @@ namespace Sudzekai.LinCtrl.Core
         };
 
         private static readonly object _sync = new();
+
+        public static JsonTypeInfo<T> GetTypeInfo<T>()
+            => (JsonTypeInfo<T>)JsonSerializerOptions.GetTypeInfo(typeof(T));
 
         public static void AddTypeInfoResolver(IJsonTypeInfoResolver resolver)
         {

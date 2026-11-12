@@ -1,4 +1,4 @@
-﻿using Sudzekai.LinCtrl.Core;
+using Sudzekai.LinCtrl.Core;
 using System.Text.Json;
 using AspHttpResponse = Microsoft.AspNetCore.Http.HttpResponse;
 
@@ -12,7 +12,7 @@ namespace Sudzekai.LinCtrl.Hosting.Internals.Services.Handlers.Services
         {
             response.ContentLength = data.Length;
 
-            using var writer = new Utf8JsonWriter(response.Body);
+            await using var writer = new Utf8JsonWriter(response.Body);
 
             writer.WriteRawValue(data);
 
